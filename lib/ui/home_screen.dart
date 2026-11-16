@@ -97,30 +97,25 @@ class _HomeScreenState extends State<HomeScreen> {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 28, 20, 8),
-            child: Row(children: [
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const GoldText('Zapio',
-                      style: TextStyle(fontSize: 38, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
-                  const SizedBox(height: 2),
-                  Text(
-                    devices.isEmpty
-                        ? tr(context, 'Your home, one remote', 'Một remote cho cả ngôi nhà')
-                        : tr(context, '${devices.length} devices', '${devices.length} thiết bị'),
-                    style: const TextStyle(color: Lux.muted, fontSize: 14),
-                  ),
-                  const SizedBox(height: 8),
-                  _AppSignature(version: _appVersion),
-                  if (updateChannel == 'github')
-                    TextButton.icon(
-                      onPressed: () => UpdateGate.checkNow(context),
-                      icon: const Icon(Icons.system_update_rounded, size: 16),
-                      label: Text(tr(context, 'Check for updates', 'Kiểm tra cập nhật')),
-                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 0)),
-                    ),
-                ]),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const GoldText('Zapio',
+                  style: TextStyle(fontSize: 38, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
+              const SizedBox(height: 2),
+              Text(
+                devices.isEmpty
+                    ? tr(context, 'Your home, one remote', 'Một remote cho cả ngôi nhà')
+                    : tr(context, '${devices.length} devices', '${devices.length} thiết bị'),
+                style: const TextStyle(color: Lux.muted, fontSize: 14),
               ),
-              _RoundGoldButton(icon: Icons.add_rounded, onTap: _add),
+              const SizedBox(height: 8),
+              _AppSignature(version: _appVersion),
+              if (updateChannel == 'github')
+                TextButton.icon(
+                  onPressed: () => UpdateGate.checkNow(context),
+                  icon: const Icon(Icons.system_update_rounded, size: 16),
+                  label: Text(tr(context, 'Check for updates', 'Kiểm tra cập nhật')),
+                  style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 0)),
+                ),
             ]),
           ),
         ),
@@ -224,20 +219,6 @@ class _AppSignature extends StatelessWidget {
             ],
           );
         },
-      );
-}
-
-class _RoundGoldButton extends StatelessWidget {
-  const _RoundGoldButton({required this.icon, required this.onTap});
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => RemoteKey(
-        icon: icon,
-        size: 52,
-        style: KeyStyle.gold,
-        onPressed: onTap,
       );
 }
 
