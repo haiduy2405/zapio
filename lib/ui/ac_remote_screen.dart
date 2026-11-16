@@ -118,6 +118,7 @@ class _AcRemoteScreenState extends State<AcRemoteScreen> {
       do {
         _sendAgain = false;
         final state = _s.copy();
+        if (!mounted) return;
         final ok = await sendAc(context, p, state, wasOn: _lastSentOn, wasSwing: _lastSentSwing);
         if (ok) {
           _lastSentOn = state.power;

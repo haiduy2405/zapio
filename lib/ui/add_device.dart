@@ -136,12 +136,11 @@ class _CategoryTile extends StatelessWidget {
 /// Searchable brand list (popular brands first).
 class _BrandList extends StatefulWidget {
   const _BrandList({required this.title, required this.brands, required this.popular, required this.onPick,
-      this.trailing, this.footer});
+      this.footer});
   final String title;
   final List<String> brands;
   final List<String> popular;
   final void Function(String brand) onPick;
-  final String? Function(String brand)? trailing;
   final Widget? footer;
 
   @override
@@ -159,12 +158,7 @@ class _BrandListState extends State<_BrandList> {
     Widget tile(String b) => ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           title: Text(b, style: const TextStyle(fontWeight: FontWeight.w500)),
-          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-            if (widget.trailing?.call(b) != null)
-              Text(widget.trailing!(b)!, style: const TextStyle(color: Lux.muted, fontSize: 12)),
-            const SizedBox(width: 6),
-            const Icon(Icons.chevron_right_rounded, color: Lux.faint),
-          ]),
+          trailing: const Icon(Icons.chevron_right_rounded, color: Lux.faint),
           onTap: () => widget.onPick(b),
         );
     return LuxScaffold(
