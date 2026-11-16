@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../devices/device_store.dart';
 import '../l10n.dart';
+import '../update/update_gate.dart';
 import '../update/updater.dart';
 import 'ac_remote_screen.dart';
 import 'add_device.dart';
@@ -110,6 +111,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 8),
                   _AppSignature(version: _appVersion),
+                  if (updateChannel == 'github')
+                    TextButton.icon(
+                      onPressed: () => UpdateGate.checkNow(context),
+                      icon: const Icon(Icons.system_update_rounded, size: 16),
+                      label: Text(tr(context, 'Check for updates', 'Kiểm tra cập nhật')),
+                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 0)),
+                    ),
                 ]),
               ),
               _RoundGoldButton(icon: Icons.add_rounded, onTap: _add),

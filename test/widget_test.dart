@@ -13,6 +13,11 @@ void main() {
     expect(find.text('Zapio'), findsOneWidget);
     expect(find.text('No devices yet'), findsOneWidget);
     expect(find.text('Made by duyluma'), findsOneWidget);
+    expect(find.text('Check for updates'), findsOneWidget);
+
+    await tester.tap(find.text('Check for updates'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Could not check for updates'), findsOneWidget);
   });
 
   testWidgets('home shows the installed app version', (tester) async {

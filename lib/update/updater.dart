@@ -24,6 +24,8 @@ class Updater {
 
   static const _repo = 'haiduy2405/zapio';
   static const _ch = MethodChannel('zapio/update');
+  static const _timeout = Duration(seconds: 7);
+  static final _buildTag = RegExp(r'^build-([1-9][0-9]*)$');
 
   final _installErrors = StreamController<String>.broadcast();
   Stream<String> get installErrors => _installErrors.stream;
@@ -46,42 +48,74 @@ class Updater {
     }
   }
 
-  /// Returns the newer release, or null if up to date / offline / Play build.
+  /// Returns the newer release or null if up to date. Network failures throw.
   Future<AppRelease?> check() async {
     if (updateChannel != 'github') return null;
     _wire();
     final (current, _) = await currentVersion();
-    if (current <= 0) return null;
-    final client = HttpClient()..connectionTimeout = const Duration(seconds: 6);
+    if (current <= 0) throw StateError('Could not read the installed ZAPIO build number');
+    final client = HttpClient()
+      ..connectionTimeout = _timeout
+      ..userAgent = 'Zapio';
     try {
-      final req = await client
-          .getUrl(Uri.parse('https://api.github.com/repos/$_repo/releases/latest'))
-          .timeout(const Duration(seconds: 8));
-      req.headers.set('Accept', 'application/vnd.github+json');
-      req.headers.set('Cache-Control', 'no-cache');
-      final res = await req.close().timeout(const Duration(seconds: 8));
-      if (res.statusCode != 200) return null;
-      final j = jsonDecode(await res.transform(utf8.decoder).join()) as Map<String, dynamic>;
-      final tag = (j['tag_name'] ?? '').toString(); // build-N
-      final build = int.tryParse(tag.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-      if (build <= current) return null;
-      String? apk;
-      for (final a in (j['assets'] as List? ?? const [])) {
-        final url = (a as Map<String, dynamic>)['browser_download_url']?.toString() ?? '';
-        if (url.endsWith('.apk')) apk = url;
+      AppRelease latest;
+      try {
+        latest = await _checkApi(client);
+      } catch (_) {
+        latest = await _checkReleasePage(client);
       }
-      if (apk == null) return null;
-      return AppRelease(
-        build: build,
-        name: (j['name'] ?? tag).toString(),
-        apkUrl: apk,
-        notes: _cleanNotes((j['body'] ?? '').toString()),
-      );
-    } catch (_) {
-      return null;
+      return latest.build > current ? latest : null;
     } finally {
       client.close(force: true);
     }
+  }
+
+  static String _apkUrl(int build) =>
+      'https://github.com/$_repo/releases/download/build-$build/zapio-build-$build.apk';
+
+  Future<AppRelease> _checkApi(HttpClient client) async {
+    final endpoint = Uri.https('api.github.com', '/repos/$_repo/releases/latest');
+    final request = await client.getUrl(endpoint).timeout(_timeout);
+    request.headers.set('Accept', 'application/vnd.github+json');
+    request.headers.set('Cache-Control', 'no-cache');
+    final response = await request.close().timeout(_timeout);
+    if (response.statusCode != 200) throw HttpException('GitHub API HTTP ${response.statusCode}');
+    final body = await response.transform(utf8.decoder).join().timeout(_timeout);
+    final data = jsonDecode(body) as Map<String, dynamic>;
+    final build = int.parse(_buildTag.firstMatch(data['tag_name'] as String)!.group(1)!);
+    final url = _apkUrl(build);
+    final assets = data['assets'] as List;
+    if (!assets.any((asset) => asset is Map && asset['browser_download_url'] == url)) {
+      throw const FormatException('The latest release has no ZAPIO APK');
+    }
+    return AppRelease(
+      build: build,
+      name: data['name']?.toString() ?? 'Zapio build $build',
+      apkUrl: url,
+      notes: _cleanNotes(data['body']?.toString() ?? ''),
+    );
+  }
+
+  Future<AppRelease> _checkReleasePage(HttpClient client) async {
+    final endpoint = Uri.https('github.com', '/$_repo/releases/latest');
+    final request = await client.getUrl(endpoint).timeout(_timeout);
+    request.followRedirects = false;
+    request.headers.set('Cache-Control', 'no-cache');
+    final response = await request.close().timeout(_timeout);
+    final location = response.headers.value(HttpHeaders.locationHeader);
+    if (!response.isRedirect || location == null) {
+      throw HttpException('GitHub Releases HTTP ${response.statusCode}');
+    }
+    final target = endpoint.resolve(location);
+    const prefix = '/$_repo/releases/tag/';
+    if (target.scheme != 'https' || target.host != endpoint.host ||
+        !target.path.startsWith(prefix)) {
+      throw const FormatException('GitHub did not return a ZAPIO release');
+    }
+    final match = _buildTag.firstMatch(target.path.substring(prefix.length));
+    if (match == null) throw const FormatException('Unrecognized ZAPIO build tag');
+    final build = int.parse(match.group(1)!);
+    return AppRelease(build: build, name: 'Zapio build $build', apkUrl: _apkUrl(build), notes: '');
   }
 
   static String _cleanNotes(String body) => body

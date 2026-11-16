@@ -13,12 +13,17 @@ class UpdateGate extends StatefulWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final Widget child;
 
+  static void checkNow(BuildContext context) =>
+      context.findAncestorStateOfType<_UpdateGateState>()?._check(manual: true);
+
   @override
   State<UpdateGate> createState() => _UpdateGateState();
 }
 
 class _UpdateGateState extends State<UpdateGate> with WidgetsBindingObserver {
   bool _showing = false;
+  bool _checking = false;
+  bool _showCheckResult = false;
   DateTime _lastCheck = DateTime.fromMillisecondsSinceEpoch(0);
 
   @override
@@ -39,26 +44,51 @@ class _UpdateGateState extends State<UpdateGate> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) _check();
   }
 
-  Future<void> _check() async {
-    if (_showing) return;
-    // At most one network check every 20 s (resume can fire repeatedly).
-    if (DateTime.now().difference(_lastCheck) < const Duration(seconds: 20)) return;
+  Future<void> _check({bool manual = false}) async {
+    if (!mounted || _showing || updateChannel != 'github') return;
+    if (manual) _showCheckResult = true;
+    if (_checking || (!manual && DateTime.now().difference(_lastCheck) < const Duration(seconds: 20))) return;
+    _checking = true;
     _lastCheck = DateTime.now();
-    final r = await Updater.instance.check();
-    final ctx = widget.navigatorKey.currentContext;
-    if (r == null || ctx == null || !ctx.mounted || _showing) return;
-    _showing = true;
-    await showGeneralDialog<void>(
-      context: ctx,
-      barrierDismissible: false,
-      barrierColor: const Color(0xCC000000),
-      pageBuilder: (_, __, ___) => UpdateDialog(release: r),
-      transitionBuilder: (_, a, __, child) => FadeTransition(
-        opacity: a,
-        child: ScaleTransition(scale: Tween(begin: 0.94, end: 1.0).animate(a), child: child),
-      ),
-    );
-    _showing = false;
+    try {
+      final release = await Updater.instance.check();
+      if (!mounted) return;
+      final overlay = widget.navigatorKey.currentState?.overlay;
+      if (overlay == null || !overlay.mounted) return;
+      final ctx = overlay.context;
+      if (release == null) {
+        _message(tr(ctx, 'ZAPIO is up to date', 'ZAPIO đang ở bản mới nhất'));
+        return;
+      }
+      _showing = true;
+      await showGeneralDialog<void>(
+        context: ctx,
+        barrierDismissible: false,
+        barrierColor: const Color(0xCC000000),
+        pageBuilder: (_, __, ___) => UpdateDialog(release: release),
+        transitionBuilder: (_, a, __, child) => FadeTransition(
+          opacity: a,
+          child: ScaleTransition(scale: Tween(begin: 0.94, end: 1.0).animate(a), child: child),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      _message(tr(context,
+          'Could not check for updates. Try another network or try again later.',
+          'Không kiểm tra được cập nhật. Thử đổi mạng hoặc thử lại sau.'));
+      debugPrint('ZAPIO update check: $error');
+    } finally {
+      _checking = false;
+      _showing = false;
+      _showCheckResult = false;
+    }
+  }
+
+  void _message(String text) {
+    if (!_showCheckResult) return;
+    ScaffoldMessenger.maybeOf(context)
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
   }
 
   @override
