@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'ui/ir_screens.dart';
-import 'ui/wifi_screens.dart';
+import 'ui/home_screen.dart';
 
 void main() => runApp(const ZapioApp());
 
@@ -17,41 +17,20 @@ class ZapioApp extends StatelessWidget {
     return MaterialApp(
       title: 'Zapio',
       debugShowCheckedModeBanner: false,
+      supportedLocales: const [Locale('en'), Locale('vi')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         colorScheme: scheme,
         scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
+        cardTheme: const CardThemeData(color: Color(0xFF1E1E1E)),
         useMaterial3: true,
       ),
-      home: const HomeShell(),
-    );
-  }
-}
-
-class HomeShell extends StatefulWidget {
-  const HomeShell({super.key});
-
-  @override
-  State<HomeShell> createState() => _HomeShellState();
-}
-
-class _HomeShellState extends State<HomeShell> {
-  int _tab = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _tab,
-        children: const [IrHomeScreen(), WifiHomeScreen()],
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.settings_remote), label: 'Hồng ngoại'),
-          NavigationDestination(icon: Icon(Icons.wifi), label: 'Wi-Fi'),
-        ],
-      ),
+      home: const HomeScreen(),
     );
   }
 }

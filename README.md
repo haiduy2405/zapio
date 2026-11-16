@@ -8,8 +8,10 @@ Author: duyluma
 ## Stack
 - Flutter (Dart) UI + Wi-Fi protocols
 - Kotlin bridge `zapio/ir` → Android `ConsumerIrManager` (`MainActivity.kt`)
-- IR code library: Flipper-format `.ir` files bundled in `assets/ir/`
-  (regenerate with `python3 tools/build_ir_assets.py <Flipper-IRDB checkout>`)
+- IR code DB: `assets/irdb/<Category>.json.gz`, built from flipperdevices/irdb
+  (MIT) with `python3 tools/build_irdb.py <checkout>` — see NOTICE.md
+- Wi-Fi: Samsung Tizen (WebSocket), LG webOS (SSAP), Roku (ECP); discovery via
+  SSDP + /24 sweep
 
 ## Build
 Every push to `main` runs GitHub Actions: analyze → test → build release APK →

@@ -102,4 +102,20 @@ void main() {
       expect(d % 889, 0);
     }
   });
+
+  test('Kaseikyo is 48 bits with header', () {
+    final f = encodeSignal(IrSignal.parsed(
+        name: 'p', protocol: 'Kaseikyo', address: 0x00200280, command: 0x3D));
+    expect(f.frequency, 37000);
+    expect(f.pattern.length, 2 + 96 + 1);
+    expect(f.pattern.take(2), [3456, 1728]);
+  });
+
+  test('RCA and Pioneer encode', () {
+    final rca = encodeSignal(IrSignal.parsed(name: 'r', protocol: 'RCA', address: 0xF, command: 0x54));
+    expect(rca.frequency, 56000);
+    expect(rca.pattern.length, 2 + 48 + 1);
+    final pio = encodeSignal(IrSignal.parsed(name: 'p', protocol: 'Pioneer', address: 0xA5, command: 0x1C));
+    expect(pio.pattern.length, 67);
+  });
 }

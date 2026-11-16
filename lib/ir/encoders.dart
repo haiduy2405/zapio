@@ -21,13 +21,13 @@ class UnsupportedProtocol implements Exception {
 
 /// Protocols the encoder can turn into timings.
 const supportedProtocols = {
-  'NEC', 'NECext', 'NEC42', 'Samsung32', 'SIRC', 'SIRC15', 'SIRC20',
-  'RC5', 'RC5X', 'RC6',
+  'NEC', 'NECext', 'NEC42', 'NEC42ext', 'Samsung32', 'SIRC', 'SIRC15',
+  'SIRC20', 'RC5', 'RC5X', 'RC6', 'Kaseikyo', 'RCA', 'Pioneer',
 };
 
 IrFrame encodeSignal(IrSignal s) {
   if (s.isRaw) {
-    return IrFrame(s.frequency, s.data.where((e) => e > 0).toList());
+    return IrFrame(s.frequency, sanitizeRaw(s.data));
   }
   final a = s.address;
   final c = s.command;
@@ -52,6 +52,35 @@ IrFrame encodeSignal(IrSignal s) {
         ..._lsb(c & 0xFF, 8),
         ..._lsb(~c & 0xFF, 8),
       ]));
+    case 'NEC42ext':
+      return IrFrame(38000, _nec([
+        ..._lsb(a & 0x3FFFFFF, 26),
+        ..._lsb(c & 0xFFFF, 16),
+      ]));
+    case 'Kaseikyo':
+      return IrFrame(37000, _kaseikyo(a, c));
+    case 'RCA':
+      return IrFrame(56000, _pulseDistance(
+        hdrMark: 4000, hdrSpace: 4000, bitMark: 500,
+        oneSpace: 2000, zeroSpace: 1000,
+        bits: [
+          ..._msb(a & 0xF, 4),
+          ..._msb(c & 0xFF, 8),
+          ..._msb(~a & 0xF, 4),
+          ..._msb(~c & 0xFF, 8),
+        ],
+      ));
+    case 'Pioneer':
+      return IrFrame(40000, _pulseDistance(
+        hdrMark: 8500, hdrSpace: 4225, bitMark: 500,
+        oneSpace: 1500, zeroSpace: 500,
+        bits: [
+          ..._lsb(a & 0xFF, 8),
+          ..._lsb(~a & 0xFF, 8),
+          ..._lsb(c & 0xFF, 8),
+          ..._lsb(~c & 0xFF, 8),
+        ],
+      ));
     case 'Samsung32':
       return IrFrame(38000, _pulseDistance(
         hdrMark: 4500, hdrSpace: 4500, bitMark: 560,
@@ -81,6 +110,38 @@ IrFrame encodeSignal(IrSignal s) {
 }
 
 // ---------------------------------------------------------------- helpers
+
+/// Cleans a captured raw pattern for ConsumerIrManager:
+/// zero-length entries are merged away (keeping mark/space alternation),
+/// long gaps are capped at 100 ms and the burst is cut below 1.9 s.
+List<int> sanitizeRaw(List<int> data) {
+  final out = <int>[];
+  var pendingMerge = false;
+  for (final raw in data) {
+    final d = raw.abs();
+    if (d == 0) {
+      pendingMerge = out.isNotEmpty;
+      continue;
+    }
+    if (pendingMerge) {
+      out[out.length - 1] += d;
+      pendingMerge = false;
+    } else {
+      out.add(d);
+    }
+  }
+  var total = 0;
+  for (var i = 0; i < out.length; i++) {
+    if (out[i] > 100000) out[i] = 100000;
+    total += out[i];
+    if (total > 1900000) {
+      out.removeRange(i, out.length);
+      break;
+    }
+  }
+  if (out.length.isEven && out.isNotEmpty) out.removeLast(); // end on a mark
+  return out;
+}
 
 List<int> _lsb(int value, int count) =>
     [for (var i = 0; i < count; i++) (value >> i) & 1];
@@ -154,6 +215,29 @@ List<int> levelsToPattern(List<(bool, int)> segs) {
   }
   if (last == false) out.removeLast();
   return out;
+}
+
+/// Panasonic/Kaseikyo 48-bit. Flipper packs the address as
+/// id(2) << 24 | vendor(16) << 8 | genre1(4) << 4 | genre2(4).
+List<int> _kaseikyo(int address, int command) {
+  final id = (address >> 24) & 0x3;
+  final vendor = (address >> 8) & 0xFFFF;
+  final genre1 = (address >> 4) & 0xF;
+  final genre2 = address & 0xF;
+  final d = List<int>.filled(6, 0);
+  d[0] = vendor & 0xFF;
+  d[1] = (vendor >> 8) & 0xFF;
+  var parity = d[0] ^ d[1];
+  parity = (parity & 0xF) ^ (parity >> 4);
+  d[2] = (parity & 0xF) | (genre1 << 4);
+  d[3] = (genre2 & 0xF) | ((command & 0xF) << 4);
+  d[4] = ((id & 0x3) << 6) | ((command >> 4) & 0x3F);
+  d[5] = d[2] ^ d[3] ^ d[4];
+  return _pulseDistance(
+    hdrMark: 3456, hdrSpace: 1728, bitMark: 432,
+    oneSpace: 1296, zeroSpace: 432,
+    bits: [for (final b in d) ..._lsb(b, 8)],
+  );
 }
 
 /// Philips RC5 (Manchester, 889 µs half-bit). '1' = space→mark.

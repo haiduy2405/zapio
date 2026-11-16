@@ -38,11 +38,13 @@ class MainActivity : FlutterActivity() {
                         } else if (freq == null || pattern == null || pattern.isEmpty()) {
                             result.error("BAD_ARGS", "Missing frequency or pattern", null)
                         } else {
+                            // Many phones only support a few fixed carriers (e.g. vivo: 30/33/36/38/40/56 kHz).
+                            val carrier = nearestCarrier(ir, freq)
                             // transmit() blocks until the signal is sent, keep it off the UI thread.
                             Thread {
                                 try {
-                                    ir.transmit(freq, pattern)
-                                    runOnUiThread { result.success(true) }
+                                    ir.transmit(carrier, pattern)
+                                    runOnUiThread { result.success(carrier) }
                                 } catch (e: Exception) {
                                     runOnUiThread { result.error("TX_FAIL", e.message, null) }
                                 }
@@ -53,5 +55,20 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+    }
+
+    private fun nearestCarrier(ir: ConsumerIrManager, freq: Int): Int {
+        val ranges = try { ir.carrierFrequencies } catch (e: Exception) { null }
+        if (ranges == null || ranges.isEmpty()) return freq
+        var best = freq
+        var bestDiff = Int.MAX_VALUE
+        for (r in ranges) {
+            if (freq in r.minFrequency..r.maxFrequency) return freq
+            for (c in intArrayOf(r.minFrequency, r.maxFrequency)) {
+                val d = kotlin.math.abs(c - freq)
+                if (d < bestDiff) { bestDiff = d; best = c }
+            }
+        }
+        return best
     }
 }

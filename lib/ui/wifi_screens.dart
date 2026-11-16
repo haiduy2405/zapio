@@ -1,21 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-import '../wifi/samsung_tizen.dart';
+import '../devices/device_store.dart';
+import '../l10n.dart';
+import '../wifi/discovery.dart';
+import '../wifi/tv_link.dart';
+import 'widgets.dart';
 
-class WifiHomeScreen extends StatefulWidget {
-  const WifiHomeScreen({super.key});
+String kindLabel(DeviceKind k) => switch (k) {
+      DeviceKind.samsung => 'Samsung',
+      DeviceKind.lg => 'LG webOS',
+      DeviceKind.roku => 'Roku',
+      DeviceKind.ir => 'IR',
+    };
+
+class WifiDiscoverScreen extends StatefulWidget {
+  const WifiDiscoverScreen({super.key});
 
   @override
-  State<WifiHomeScreen> createState() => _WifiHomeScreenState();
+  State<WifiDiscoverScreen> createState() => _WifiDiscoverScreenState();
 }
 
-class _WifiHomeScreenState extends State<WifiHomeScreen> {
+class _WifiDiscoverScreenState extends State<WifiDiscoverScreen> {
+  final _found = <FoundTv>[];
   final _ipCtrl = TextEditingController();
-  List<SamsungTv> _found = [];
   bool _scanning = false;
   double _progress = 0;
   String? _note;
+
+  @override
+  void initState() {
+    super.initState();
+    _scan();
+  }
 
   @override
   void dispose() {
@@ -27,94 +43,122 @@ class _WifiHomeScreenState extends State<WifiHomeScreen> {
     setState(() {
       _scanning = true;
       _progress = 0;
-      _found = [];
+      _found.clear();
       _note = null;
     });
-    final tvs = await SamsungTizen.scan(onProgress: (d, t) {
-      if (mounted) setState(() => _progress = t == 0 ? 1 : d / t);
-    });
+    await TvDiscovery.scan(
+      onFound: (t) {
+        if (mounted) setState(() => _found.add(t));
+      },
+      onProgress: (p) {
+        if (mounted) setState(() => _progress = p);
+      },
+    );
     if (!mounted) return;
     setState(() {
-      _found = tvs;
       _scanning = false;
-      _note = tvs.isEmpty
-          ? 'Không tìm thấy TV Samsung. Kiểm tra TV đang bật và cùng mạng Wi-Fi.'
-          : null;
+      if (_found.isEmpty) {
+        _note = tr(context,
+            'No TV found. Make sure the TV is on and on the same Wi-Fi as this phone.',
+            'Không tìm thấy TV. Kiểm tra TV đang bật và cùng mạng Wi-Fi với điện thoại.');
+      }
     });
   }
 
   Future<void> _manual() async {
     final ip = _ipCtrl.text.trim();
     if (ip.isEmpty) return;
-    setState(() => _note = 'Đang kiểm tra $ip…');
-    final tv = await SamsungTizen.probe(ip, timeout: const Duration(seconds: 3));
+    setState(() => _note = '…');
+    final t = await TvDiscovery.probeIp(ip);
     if (!mounted) return;
-    if (tv == null) {
-      setState(() => _note = 'Không phải TV Samsung Tizen, hoặc TV đang tắt.');
+    if (t == null) {
+      setState(() => _note = tr(context, 'No supported TV at $ip.', 'Không có TV hỗ trợ tại $ip.'));
       return;
     }
     setState(() => _note = null);
-    _open(tv);
+    _pick(t);
   }
 
-  void _open(SamsungTv tv) => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => SamsungRemoteScreen(tv: tv)),
+  Future<void> _pick(FoundTv t) async {
+    final store = DeviceStore.instance;
+    var d = store.findWifi(t.kind, t.ip);
+    if (d == null) {
+      d = SavedDevice(
+        id: store.newId(),
+        name: t.name,
+        kind: t.kind,
+        category: Cat.tv,
+        ip: t.ip,
       );
+      await store.add(d);
+    }
+    if (!mounted) return;
+    final saved = d;
+    Navigator.of(context).popUntil((r) => r.isFirst);
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => TvRemoteScreen(device: saved)));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Zapio • Wi-Fi')),
+      appBar: AppBar(
+        title: Text(tr(context, 'Smart TV over Wi-Fi', 'Smart TV qua Wi-Fi')),
+        actions: [
+          IconButton(onPressed: _scanning ? null : _scan, icon: const Icon(Icons.refresh)),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('TV Samsung (Tizen, 2016+)', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          FilledButton.icon(
-            icon: const Icon(Icons.radar),
-            label: Text(_scanning ? 'Đang quét…' : 'Quét mạng Wi-Fi'),
-            onPressed: _scanning ? null : _scan,
-          ),
           if (_scanning) ...[
+            LinearProgressIndicator(value: _progress == 0 ? null : _progress),
             const SizedBox(height: 8),
-            LinearProgressIndicator(value: _progress),
+            Text(tr(context, 'Searching your network…', 'Đang tìm trong mạng…'),
+                style: const TextStyle(color: Colors.white60)),
+            const SizedBox(height: 8),
           ],
-          const SizedBox(height: 12),
-          for (final tv in _found)
+          for (final t in _found)
             Card(
               child: ListTile(
-                leading: const Icon(Icons.tv),
-                title: Text(tv.name),
-                subtitle: Text('${tv.model ?? ''}  ${tv.ip}'),
+                leading: const Icon(Icons.tv, size: 32),
+                title: Text(t.name),
+                subtitle: Text('${kindLabel(t.kind)} • ${t.ip}'),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => _open(tv),
+                onTap: () => _pick(t),
               ),
             ),
-          const SizedBox(height: 16),
+          if (_note != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(_note!, style: const TextStyle(color: Colors.amberAccent)),
+            ),
+          const SizedBox(height: 24),
+          Text(tr(context, 'Or enter the TV’s IP address', 'Hoặc nhập địa chỉ IP của TV'),
+              style: const TextStyle(color: Colors.white60)),
+          const SizedBox(height: 8),
           Row(children: [
             Expanded(
               child: TextField(
                 controller: _ipCtrl,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
-                  labelText: 'Hoặc nhập IP của TV',
                   hintText: '192.168.1.23',
                   border: OutlineInputBorder(),
                 ),
               ),
             ),
             const SizedBox(width: 8),
-            FilledButton.tonal(onPressed: _manual, child: const Text('Kết nối')),
+            FilledButton.tonal(
+              onPressed: _manual,
+              child: Text(tr(context, 'Connect', 'Kết nối')),
+            ),
           ]),
-          if (_note != null) ...[
-            const SizedBox(height: 12),
-            Text(_note!, style: const TextStyle(color: Colors.amberAccent)),
-          ],
           const SizedBox(height: 24),
-          const Text(
-            'Mẹo: lần đầu kết nối, TV sẽ hiện hộp thoại "Cho phép" — chọn Cho phép. '
-            'TV đang tắt hẳn thì Wi-Fi không bật được, hãy dùng nút nguồn ở tab Hồng ngoại.',
-            style: TextStyle(color: Colors.white60),
+          Text(
+            tr(context,
+                'Supported: Samsung (2016+), LG webOS, Roku. The first time, accept the request shown on the TV.',
+                'Hỗ trợ: Samsung (2016+), LG webOS, Roku. Lần đầu kết nối, chọn "Cho phép" trên TV.'),
+            style: const TextStyle(color: Colors.white38, fontSize: 13),
           ),
         ],
       ),
@@ -122,23 +166,23 @@ class _WifiHomeScreenState extends State<WifiHomeScreen> {
   }
 }
 
-class SamsungRemoteScreen extends StatefulWidget {
-  const SamsungRemoteScreen({super.key, required this.tv});
-  final SamsungTv tv;
+class TvRemoteScreen extends StatefulWidget {
+  const TvRemoteScreen({super.key, required this.device});
+  final SavedDevice device;
 
   @override
-  State<SamsungRemoteScreen> createState() => _SamsungRemoteScreenState();
+  State<TvRemoteScreen> createState() => _TvRemoteScreenState();
 }
 
-class _SamsungRemoteScreenState extends State<SamsungRemoteScreen> {
-  late final SamsungRemoteSession _session;
+class _TvRemoteScreenState extends State<TvRemoteScreen> {
+  late final TvLink _link;
   TvLinkState _state = TvLinkState.idle;
   String _detail = '';
 
   @override
   void initState() {
     super.initState();
-    _session = SamsungRemoteSession(widget.tv.ip, onState: (s, d) {
+    _link = TvLink.create(widget.device.kind, widget.device.ip ?? '', (s, d) {
       if (mounted) {
         setState(() {
           _state = s;
@@ -146,85 +190,104 @@ class _SamsungRemoteScreenState extends State<SamsungRemoteScreen> {
         });
       }
     });
-    _session.connect();
+    _link.connect();
   }
 
   @override
   void dispose() {
-    _session.close();
+    _link.close();
     super.dispose();
   }
 
-  void _key(String k) {
-    HapticFeedback.lightImpact();
-    _session.sendKey(k);
-  }
+  VoidCallback? _k(TvKey k) => _state == TvLinkState.connected ? () => _link.send(k) : null;
 
-  Widget _btn(IconData icon, String key, {String? label}) => Padding(
-        padding: const EdgeInsets.all(6),
-        child: FilledButton.tonal(
-          style: FilledButton.styleFrom(
-            minimumSize: const Size(72, 56),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          ),
-          onPressed: _state == TvLinkState.connected ? () => _key(key) : null,
-          child: label == null ? Icon(icon) : Text(label),
-        ),
-      );
+  String _statusText(BuildContext c) => switch (_state) {
+        TvLinkState.idle || TvLinkState.connecting => tr(c, 'Connecting…', 'Đang kết nối…'),
+        TvLinkState.waitingApproval =>
+          tr(c, 'Accept the request on your TV', 'Chọn "Cho phép" trên TV'),
+        TvLinkState.connected => tr(c, 'Connected', 'Đã kết nối'),
+        TvLinkState.denied => tr(c, 'The TV refused the connection', 'TV đã từ chối kết nối'),
+        TvLinkState.closed => tr(c, 'Disconnected', 'Đã ngắt kết nối'),
+        TvLinkState.error => tr(c, 'Can’t reach the TV (is it on?)', 'Không kết nối được TV (TV đang bật?)'),
+      };
 
   @override
   Widget build(BuildContext context) {
     final ok = _state == TvLinkState.connected;
     return Scaffold(
-      appBar: AppBar(title: Text(widget.tv.name)),
+      appBar: AppBar(title: Text(widget.device.name)),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
           Card(
             color: ok ? Colors.teal.shade900 : Colors.blueGrey.shade900,
             child: ListTile(
-              leading: Icon(ok ? Icons.link : Icons.link_off),
-              title: Text(_detail.isEmpty ? '…' : _detail),
-              subtitle: Text(widget.tv.ip),
-              trailing: ok
+              leading: Icon(ok ? Icons.wifi : Icons.wifi_off),
+              title: Text(_statusText(context)),
+              subtitle: Text(
+                '${kindLabel(widget.device.kind)} • ${widget.device.ip}'
+                '${_detail.isNotEmpty && !ok ? '\n$_detail' : ''}',
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: ok || _state == TvLinkState.connecting
                   ? null
-                  : TextButton(onPressed: _session.connect, child: const Text('Thử lại')),
+                  : TextButton(
+                      onPressed: () async {
+                        await _link.close();
+                        _link.connect();
+                      },
+                      child: Text(tr(context, 'Retry', 'Thử lại')),
+                    ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            _btn(Icons.power_settings_new, 'KEY_POWER'),
-            _btn(Icons.home, 'KEY_HOME'),
-            _btn(Icons.input, 'KEY_SOURCE'),
+            RemoteKey(icon: Icons.power_settings_new, color: Colors.red.shade800, onPressed: _k(TvKey.power)),
+            RemoteKey(icon: Icons.input, onPressed: _k(TvKey.source)),
+            RemoteKey(icon: Icons.volume_off, onPressed: _k(TvKey.mute)),
           ]),
-          const SizedBox(height: 8),
-          Center(child: _btn(Icons.keyboard_arrow_up, 'KEY_UP')),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _btn(Icons.keyboard_arrow_left, 'KEY_LEFT'),
-            _btn(Icons.circle_outlined, 'KEY_ENTER', label: 'OK'),
-            _btn(Icons.keyboard_arrow_right, 'KEY_RIGHT'),
-          ]),
-          Center(child: _btn(Icons.keyboard_arrow_down, 'KEY_DOWN')),
-          const SizedBox(height: 8),
+          const SizedBox(height: 24),
+          Center(
+            child: DPad(
+              onUp: _k(TvKey.up),
+              onDown: _k(TvKey.down),
+              onLeft: _k(TvKey.left),
+              onRight: _k(TvKey.right),
+              onOk: _k(TvKey.ok),
+            ),
+          ),
+          const SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            _btn(Icons.arrow_back, 'KEY_RETURN'),
-            _btn(Icons.volume_off, 'KEY_MUTE'),
-            _btn(Icons.menu, 'KEY_MENU'),
+            RemoteKey(icon: Icons.arrow_back, onPressed: _k(TvKey.back)),
+            RemoteKey(icon: Icons.home_outlined, onPressed: _k(TvKey.home)),
+            RemoteKey(icon: Icons.menu, onPressed: _k(TvKey.menu)),
           ]),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          const SizedBox(height: 20),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            RockerKey(label: 'VOL', onUp: _k(TvKey.volUp), onDown: _k(TvKey.volDown)),
             Column(children: [
-              _btn(Icons.volume_up, 'KEY_VOLUP'),
-              _btn(Icons.volume_down, 'KEY_VOLDOWN'),
+              RemoteKey(icon: Icons.play_arrow, onPressed: _k(TvKey.play)),
+              const SizedBox(height: 18),
+              RemoteKey(icon: Icons.pause, onPressed: _k(TvKey.pause)),
             ]),
-            Column(children: [
-              _btn(Icons.play_arrow, 'KEY_PLAY'),
-              _btn(Icons.pause, 'KEY_PAUSE'),
-            ]),
-            Column(children: [
-              _btn(Icons.keyboard_arrow_up, 'KEY_CHUP', label: 'CH +'),
-              _btn(Icons.keyboard_arrow_down, 'KEY_CHDOWN', label: 'CH −'),
-            ]),
+            RockerKey(
+              label: 'CH',
+              onUp: _k(TvKey.chUp),
+              onDown: _k(TvKey.chDown),
+              upIcon: Icons.keyboard_arrow_up,
+              downIcon: Icons.keyboard_arrow_down,
+            ),
           ]),
+          if (!ok) ...[
+            const SizedBox(height: 20),
+            Text(
+              tr(context,
+                  'Tip: when the TV is fully off, Wi-Fi control can’t wake it — add the same TV over IR to turn it on.',
+                  'Mẹo: khi TV tắt hẳn, Wi-Fi không bật được TV — hãy thêm TV này qua hồng ngoại để bật nguồn.'),
+              style: const TextStyle(color: Colors.white38, fontSize: 13),
+            ),
+          ],
         ],
       ),
     );

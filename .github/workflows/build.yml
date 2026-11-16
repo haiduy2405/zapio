@@ -30,6 +30,8 @@ jobs:
         run: flutter create --project-name zapio --org com.duyluma --platforms android .
 
       - run: flutter pub get
+      - name: Launcher icons
+        run: dart run flutter_launcher_icons
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
       - run: flutter build apk --release
