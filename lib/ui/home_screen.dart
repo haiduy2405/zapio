@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../devices/device_store.dart';
 import '../l10n.dart';
+import '../update/updater.dart';
 import 'ac_remote_screen.dart';
 import 'add_device.dart';
 import 'ir_remote_screen.dart';
@@ -18,10 +19,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final store = DeviceStore.instance;
+  late final Future<(int, String)> _appVersion;
 
   @override
   void initState() {
     super.initState();
+    _appVersion = Updater.instance.currentVersion();
     store.addListener(_changed);
     if (!store.loaded) store.load();
   }
@@ -105,6 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         : tr(context, '${devices.length} devices', '${devices.length} thiết bị'),
                     style: const TextStyle(color: Lux.muted, fontSize: 14),
                   ),
+                  const SizedBox(height: 8),
+                  _AppSignature(version: _appVersion),
                 ]),
               ),
               _RoundGoldButton(icon: Icons.add_rounded, onTap: _add),
@@ -159,6 +164,59 @@ class _HomeScreenState extends State<HomeScreen> {
       ]),
     );
   }
+}
+
+class _AppSignature extends StatelessWidget {
+  const _AppSignature({required this.version});
+
+  final Future<(int, String)> version;
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<(int, String)>(
+        future: version,
+        builder: (context, snapshot) {
+          final versionName = snapshot.data?.$2.trim() ?? '';
+          return Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (versionName.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0x14D9B676),
+                    border: Border.all(color: const Color(0x55D9B676)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'v$versionName',
+                    style: const TextStyle(
+                      color: Lux.goldLight,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              const Text.rich(
+                TextSpan(
+                  text: 'Made by ',
+                  children: [
+                    TextSpan(
+                      text: 'duyluma',
+                      style: TextStyle(
+                        color: Lux.gold,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                style: TextStyle(color: Lux.muted, fontSize: 11),
+              ),
+            ],
+          );
+        },
+      );
 }
 
 class _RoundGoldButton extends StatelessWidget {
