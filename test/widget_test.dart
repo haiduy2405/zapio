@@ -8,6 +8,13 @@ import 'package:zapio/ui/home_screen.dart';
 void main() {
   testWidgets('home shows empty state', (tester) async {
     SharedPreferences.setMockInitialValues({});
+    const channel = MethodChannel('zapio/update');
+    final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      expect(call.method, 'versionCode');
+      return {'code': 0, 'name': ''};
+    });
+    addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
     await tester.pumpWidget(const ZapioApp());
     await tester.pumpAndSettle();
     expect(find.text('Zapio'), findsOneWidget);
