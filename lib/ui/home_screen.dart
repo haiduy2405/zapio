@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../devices/device_store.dart';
 import '../l10n.dart';
+import 'ac_remote_screen.dart';
 import 'add_device.dart';
 import 'ir_remote_screen.dart';
+import 'theme.dart';
 import 'widgets.dart';
 import 'wifi_screens.dart';
 
@@ -36,25 +38,39 @@ class _HomeScreenState extends State<HomeScreen> {
       .push(MaterialPageRoute(builder: (_) => const AddDeviceScreen()));
 
   void _open(SavedDevice d) => Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => d.isWifi ? TvRemoteScreen(device: d) : IrRemoteScreen(device: d),
+        builder: (_) => d.isWifi
+            ? TvRemoteScreen(device: d)
+            : d.category == Cat.ac
+                ? AcRemoteScreen(device: d)
+                : IrRemoteScreen(device: d),
       ));
 
   Future<void> _menu(SavedDevice d) async {
     final action = await showModalBottomSheet<String>(
       context: context,
       builder: (c) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: Text(tr(c, 'Rename', 'Đổi tên')),
-            onTap: () => Navigator.pop(c, 'rename'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete_outline),
-            title: Text(tr(c, 'Delete', 'Xóa')),
-            onTap: () => Navigator.pop(c, 'delete'),
-          ),
-        ]),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: 40, height: 4,
+              decoration: BoxDecoration(color: Lux.faint, borderRadius: BorderRadius.circular(2)),
+            ),
+            const SizedBox(height: 12),
+            Text(d.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: Text(tr(c, 'Rename', 'Đổi tên')),
+              onTap: () => Navigator.pop(c, 'rename'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Lux.ruby),
+              title: Text(tr(c, 'Delete', 'Xóa'), style: const TextStyle(color: Lux.ruby)),
+              onTap: () => Navigator.pop(c, 'delete'),
+            ),
+          ]),
+        ),
       ),
     );
     if (!mounted) return;
@@ -72,61 +88,109 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final devices = store.devices;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Zapio', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 28)),
-        actions: [
-          IconButton(icon: const Icon(Icons.add, size: 30), onPressed: _add),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: !store.loaded
-          ? const Center(child: CircularProgressIndicator())
-          : devices.isEmpty
-              ? _Empty(onAdd: _add)
-              : GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                    childAspectRatio: 1.05,
+    return LuxScaffold(
+      body: CustomScrollView(slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 28, 20, 8),
+            child: Row(children: [
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const GoldText('Zapio',
+                      style: TextStyle(fontSize: 38, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
+                  const SizedBox(height: 2),
+                  Text(
+                    devices.isEmpty
+                        ? tr(context, 'Your home, one remote', 'Một remote cho cả ngôi nhà')
+                        : tr(context, '${devices.length} devices', '${devices.length} thiết bị'),
+                    style: const TextStyle(color: Lux.muted, fontSize: 14),
                   ),
-                  itemCount: devices.length,
-                  itemBuilder: (context, i) {
-                    final d = devices[i];
-                    return Card(
-                      margin: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(24),
-                        onTap: () => _open(d),
-                        onLongPress: () => _menu(d),
-                        child: Padding(
-                          padding: const EdgeInsets.all(18),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(d.name,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context).textTheme.titleMedium),
-                              const Spacer(),
-                              Row(children: [
-                                Icon(categoryIcon(d.category), size: 40),
-                                const Spacer(),
-                                Icon(d.isWifi ? Icons.wifi : Icons.settings_remote,
-                                    size: 18, color: Colors.white38),
-                              ]),
-                            ],
-                          ),
-                        ),
+                ]),
+              ),
+              _RoundGoldButton(icon: Icons.add_rounded, onTap: _add),
+            ]),
+          ),
+        ),
+        if (!store.loaded)
+          const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+        else if (devices.isEmpty)
+          SliverFillRemaining(hasScrollBody: false, child: _Empty(onAdd: _add))
+        else
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
+                childAspectRatio: 0.98,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, i) {
+                  if (i == devices.length) return _AddTile(onTap: _add);
+                  final d = devices[i];
+                  return LuxCard(
+                    onTap: () => _open(d),
+                    onLongPress: () => _menu(d),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Row(children: [
+                        IconBadge(categoryIcon(d.category)),
+                        const Spacer(),
+                        Icon(d.isWifi ? Icons.wifi_rounded : Icons.settings_remote_rounded,
+                            size: 16, color: Lux.faint),
+                      ]),
+                      const Spacer(),
+                      Text(d.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, height: 1.25)),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${Cat.label(context, d.category)} • ${d.isWifi ? 'Wi-Fi' : tr(context, 'Infrared', 'Hồng ngoại')}',
+                        style: const TextStyle(color: Lux.muted, fontSize: 12),
                       ),
-                    );
-                  },
-                ),
+                    ]),
+                  );
+                },
+                childCount: devices.length + 1,
+              ),
+            ),
+          ),
+      ]),
     );
   }
+}
+
+class _RoundGoldButton extends StatelessWidget {
+  const _RoundGoldButton({required this.icon, required this.onTap});
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => RemoteKey(
+        icon: icon,
+        size: 52,
+        style: KeyStyle.gold,
+        onPressed: onTap,
+      );
+}
+
+class _AddTile extends StatelessWidget {
+  const _AddTile({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => LuxCard(
+        onTap: onTap,
+        child: Center(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.add_circle_outline_rounded, color: Lux.gold, size: 36),
+            const SizedBox(height: 10),
+            Text(tr(context, 'Add device', 'Thêm thiết bị'),
+                style: const TextStyle(color: Lux.muted, fontWeight: FontWeight.w500)),
+          ]),
+        ),
+      );
 }
 
 class _Empty extends StatelessWidget {
@@ -135,29 +199,37 @@ class _Empty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.settings_remote, size: 72, color: Colors.white38),
-          const SizedBox(height: 16),
-          Text(tr(context, 'No devices yet', 'Chưa có thiết bị nào'),
-              style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(
-            tr(context, 'Add your TV, fan, projector… to control it from your phone.',
-                'Thêm TV, quạt, máy chiếu… để điều khiển bằng điện thoại.'),
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white60),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(32, 0, 32, 64),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Container(
+          width: 140,
+          height: 140,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0x55D9B676), width: 1.2),
+            gradient: const RadialGradient(colors: [Color(0x22D9B676), Color(0x00D9B676)]),
           ),
-          const SizedBox(height: 24),
-          FilledButton.icon(
-            icon: const Icon(Icons.add),
-            label: Text(tr(context, 'Add device', 'Thêm thiết bị')),
-            onPressed: onAdd,
-          ),
-        ]),
-      ),
+          child: const Icon(Icons.settings_remote_rounded, size: 56, color: Lux.gold),
+        ),
+        const SizedBox(height: 28),
+        Text(tr(context, 'No devices yet', 'Chưa có thiết bị nào'),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 10),
+        Text(
+          tr(context, 'Add your TV, fan, air conditioner or projector and control everything from here.',
+              'Thêm TV, quạt, điều hòa hay máy chiếu để điều khiển tất cả tại đây.'),
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Lux.muted, height: 1.5),
+        ),
+        const SizedBox(height: 28),
+        FilledButton.icon(
+          style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
+          icon: const Icon(Icons.add_rounded),
+          label: Text(tr(context, 'Add device', 'Thêm thiết bị')),
+          onPressed: onAdd,
+        ),
+      ]),
     );
   }
 }
@@ -171,7 +243,7 @@ Future<String?> askName(BuildContext context, String initial) {
       content: TextField(controller: ctrl, autofocus: true),
       actions: [
         TextButton(onPressed: () => Navigator.pop(c), child: Text(tr(c, 'Cancel', 'Hủy'))),
-        FilledButton(
+        TextButton(
           onPressed: () {
             final t = ctrl.text.trim();
             Navigator.pop(c, t.isEmpty ? null : t);

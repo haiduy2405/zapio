@@ -5,6 +5,7 @@ import '../ir/ir_file.dart';
 import '../ir/irdb.dart';
 import '../l10n.dart';
 import 'add_device.dart';
+import 'theme.dart';
 import 'widgets.dart';
 
 /// Remote for a saved IR device: standard layout from the mapped keys,
@@ -50,14 +51,14 @@ class _IrRemoteScreenState extends State<IrRemoteScreen> {
   @override
   Widget build(BuildContext context) {
     final r = _remote;
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.device.name)),
+    return LuxScaffold(
+      title: widget.device.name,
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : r == null
               ? Center(child: Text(tr(context, 'Remote data not found', 'Không tìm thấy dữ liệu remote')))
               : ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
                   children: [
                     _layout(context, r),
                     const SizedBox(height: 28),
@@ -66,7 +67,7 @@ class _IrRemoteScreenState extends State<IrRemoteScreen> {
                     Text(
                       '${r.brand} • ${r.model}',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white30, fontSize: 12),
+                      style: const TextStyle(color: Lux.faint, fontSize: 12),
                     ),
                   ],
                 ),
@@ -78,13 +79,13 @@ class _IrRemoteScreenState extends State<IrRemoteScreen> {
     final topRow = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        RemoteKey(icon: Icons.power_settings_new, color: Colors.red.shade800, onPressed: _k('PWR')),
+        RemoteKey(icon: Icons.power_settings_new_rounded, style: KeyStyle.power, onPressed: _k('PWR')),
         if (isFanLike)
           RemoteKey(icon: Icons.timer_outlined, onPressed: _k('TIMER'))
         else
-          RemoteKey(icon: Icons.input, onPressed: _any(['INPUT', 'TV', 'AUX'])),
+          RemoteKey(icon: Icons.input_rounded, onPressed: _any(['INPUT', 'TV', 'AUX'])),
         RemoteKey(
-          icon: isFanLike ? Icons.nights_stay_outlined : Icons.volume_off,
+          icon: isFanLike ? Icons.nights_stay_outlined : Icons.volume_off_rounded,
           onPressed: isFanLike ? _k('SLEEP') : _k('MUTE'),
         ),
       ],
@@ -93,7 +94,7 @@ class _IrRemoteScreenState extends State<IrRemoteScreen> {
     if (isFanLike) {
       return Column(children: [
         topRow,
-        const SizedBox(height: 28),
+        const SizedBox(height: 36),
         Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
           RockerKey(
             label: tr(context, 'SPEED', 'TỐC ĐỘ'),
@@ -101,14 +102,18 @@ class _IrRemoteScreenState extends State<IrRemoteScreen> {
             onDown: _any(['FAN_SPEED_DOWN', 'FAN_LOW']),
           ),
           Column(children: [
-            RemoteKey(icon: Icons.threesixty, onPressed: _any(['SHAKE_WIND', 'OSCILLATE', 'SWING'])),
+            RemoteKey(
+              icon: Icons.threesixty_rounded,
+              caption: tr(context, 'Oscillate', 'Đảo'),
+              onPressed: _any(['SHAKE_WIND', 'OSCILLATE', 'SWING']),
+            ),
             const SizedBox(height: 18),
-            RemoteKey(icon: Icons.tune, onPressed: _any(['WIND_TYPE', 'MODE'])),
+            RemoteKey(icon: Icons.tune_rounded, caption: tr(context, 'Mode', 'Chế độ'), onPressed: _any(['WIND_TYPE', 'MODE'])),
           ]),
           Column(children: [
-            RemoteKey(icon: Icons.lightbulb_outline, onPressed: _k('LIGHT')),
+            RemoteKey(icon: Icons.lightbulb_outline_rounded, caption: tr(context, 'Light', 'Đèn'), onPressed: _k('LIGHT')),
             const SizedBox(height: 18),
-            RemoteKey(icon: Icons.ac_unit, onPressed: _any(['COLD_WIND', 'COOL'])),
+            RemoteKey(icon: Icons.ac_unit_rounded, caption: tr(context, 'Cool', 'Mát'), onPressed: _any(['COLD_WIND', 'COOL'])),
           ]),
         ]),
       ]);
@@ -116,7 +121,7 @@ class _IrRemoteScreenState extends State<IrRemoteScreen> {
 
     return Column(children: [
       topRow,
-      const SizedBox(height: 24),
+      const SizedBox(height: 28),
       DPad(
         onUp: _k('UP'),
         onDown: _k('DOWN'),
@@ -124,26 +129,26 @@ class _IrRemoteScreenState extends State<IrRemoteScreen> {
         onRight: _k('RIGHT'),
         onOk: _k('OK'),
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: 24),
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        RemoteKey(icon: Icons.arrow_back, onPressed: _any(['BACK', 'EXIT'])),
-        RemoteKey(icon: Icons.home_outlined, onPressed: _k('HOME')),
-        RemoteKey(icon: Icons.menu, onPressed: _k('MENU')),
+        RemoteKey(icon: Icons.arrow_back_rounded, onPressed: _any(['BACK', 'EXIT'])),
+        RemoteKey(icon: Icons.home_rounded, onPressed: _k('HOME')),
+        RemoteKey(icon: Icons.menu_rounded, onPressed: _k('MENU')),
       ]),
-      const SizedBox(height: 20),
+      const SizedBox(height: 24),
       Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         RockerKey(label: 'VOL', onUp: _k('VOL_UP'), onDown: _k('VOL_DOWN')),
         Column(children: [
-          RemoteKey(icon: Icons.play_arrow, onPressed: _k('PLAY')),
+          RemoteKey(icon: Icons.play_arrow_rounded, onPressed: _k('PLAY')),
           const SizedBox(height: 18),
-          RemoteKey(icon: Icons.pause, onPressed: _k('PAUSE')),
+          RemoteKey(icon: Icons.pause_rounded, onPressed: _k('PAUSE')),
         ]),
         RockerKey(
           label: 'CH',
           onUp: _k('CH_UP'),
           onDown: _k('CH_DOWN'),
-          upIcon: Icons.keyboard_arrow_up,
-          downIcon: Icons.keyboard_arrow_down,
+          upIcon: Icons.keyboard_arrow_up_rounded,
+          downIcon: Icons.keyboard_arrow_down_rounded,
         ),
       ]),
     ]);
@@ -156,23 +161,28 @@ class _AllButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        title: Text(tr(context, 'All buttons (${signals.length})', 'Tất cả nút (${signals.length})')),
-        children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final s in signals)
-                ActionChip(
-                  label: Text(s.name.replaceAll('_', ' ')),
-                  onPressed: () => sendIr(context, s),
-                ),
-            ],
-          ),
-        ],
+    return LuxCard(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          title: Text(tr(context, 'All buttons (${signals.length})', 'Tất cả nút (${signals.length})'),
+              style: const TextStyle(fontWeight: FontWeight.w500)),
+          childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 14),
+          children: [
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final s in signals)
+                  ActionChip(
+                    label: Text(s.name.replaceAll('_', ' ')),
+                    onPressed: () => sendIr(context, s),
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

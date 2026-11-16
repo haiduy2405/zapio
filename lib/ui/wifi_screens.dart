@@ -4,6 +4,7 @@ import '../devices/device_store.dart';
 import '../l10n.dart';
 import '../wifi/discovery.dart';
 import '../wifi/tv_link.dart';
+import 'theme.dart';
 import 'widgets.dart';
 
 String kindLabel(DeviceKind k) => switch (k) {
@@ -68,7 +69,7 @@ class _WifiDiscoverScreenState extends State<WifiDiscoverScreen> {
   Future<void> _manual() async {
     final ip = _ipCtrl.text.trim();
     if (ip.isEmpty) return;
-    setState(() => _note = '…');
+    setState(() => _note = tr(context, 'Checking $ip…', 'Đang kiểm tra $ip…'));
     final t = await TvDiscovery.probeIp(ip);
     if (!mounted) return;
     if (t == null) {
@@ -83,13 +84,7 @@ class _WifiDiscoverScreenState extends State<WifiDiscoverScreen> {
     final store = DeviceStore.instance;
     var d = store.findWifi(t.kind, t.ip);
     if (d == null) {
-      d = SavedDevice(
-        id: store.newId(),
-        name: t.name,
-        kind: t.kind,
-        category: Cat.tv,
-        ip: t.ip,
-      );
+      d = SavedDevice(id: store.newId(), name: t.name, kind: t.kind, category: Cat.tv, ip: t.ip);
       await store.add(d);
     }
     if (!mounted) return;
@@ -100,67 +95,112 @@ class _WifiDiscoverScreenState extends State<WifiDiscoverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(tr(context, 'Smart TV over Wi-Fi', 'Smart TV qua Wi-Fi')),
-        actions: [
-          IconButton(onPressed: _scanning ? null : _scan, icon: const Icon(Icons.refresh)),
-        ],
-      ),
+    return LuxScaffold(
+      title: tr(context, 'Smart TV over Wi-Fi', 'Smart TV qua Wi-Fi'),
+      actions: [
+        IconButton(onPressed: _scanning ? null : _scan, icon: const Icon(Icons.refresh_rounded)),
+      ],
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
           if (_scanning) ...[
-            LinearProgressIndicator(value: _progress == 0 ? null : _progress),
-            const SizedBox(height: 8),
-            Text(tr(context, 'Searching your network…', 'Đang tìm trong mạng…'),
-                style: const TextStyle(color: Colors.white60)),
-            const SizedBox(height: 8),
+            Center(child: _Radar(progress: _progress)),
+            const SizedBox(height: 12),
+            Center(
+              child: Text(tr(context, 'Searching your network…', 'Đang tìm trong mạng…'),
+                  style: const TextStyle(color: Lux.muted)),
+            ),
+            const SizedBox(height: 20),
           ],
           for (final t in _found)
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.tv, size: 32),
-                title: Text(t.name),
-                subtitle: Text('${kindLabel(t.kind)} • ${t.ip}'),
-                trailing: const Icon(Icons.chevron_right),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: LuxCard(
                 onTap: () => _pick(t),
+                child: Row(children: [
+                  const IconBadge(Icons.tv_rounded),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(t.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 2),
+                      Text('${kindLabel(t.kind)} • ${t.ip}', style: const TextStyle(color: Lux.muted, fontSize: 12)),
+                    ]),
+                  ),
+                  const Icon(Icons.chevron_right_rounded, color: Lux.gold),
+                ]),
               ),
             ),
           if (_note != null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text(_note!, style: const TextStyle(color: Colors.amberAccent)),
+              child: Text(_note!, style: const TextStyle(color: Lux.goldLight)),
             ),
-          const SizedBox(height: 24),
-          Text(tr(context, 'Or enter the TV’s IP address', 'Hoặc nhập địa chỉ IP của TV'),
-              style: const TextStyle(color: Colors.white60)),
-          const SizedBox(height: 8),
+          SectionLabel(tr(context, 'Enter IP manually', 'Nhập IP thủ công')),
           Row(children: [
             Expanded(
               child: TextField(
                 controller: _ipCtrl,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  hintText: '192.168.1.23',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(hintText: '192.168.1.23'),
               ),
             ),
-            const SizedBox(width: 8),
-            FilledButton.tonal(
-              onPressed: _manual,
-              child: Text(tr(context, 'Connect', 'Kết nối')),
-            ),
+            const SizedBox(width: 10),
+            FilledButton(onPressed: _manual, child: Text(tr(context, 'Connect', 'Kết nối'))),
           ]),
-          const SizedBox(height: 24),
+          const SizedBox(height: 22),
           Text(
             tr(context,
                 'Supported: Samsung (2016+), LG webOS, Roku. The first time, accept the request shown on the TV.',
                 'Hỗ trợ: Samsung (2016+), LG webOS, Roku. Lần đầu kết nối, chọn "Cho phép" trên TV.'),
-            style: const TextStyle(color: Colors.white38, fontSize: 13),
+            style: const TextStyle(color: Lux.faint, fontSize: 13, height: 1.5),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _Radar extends StatefulWidget {
+  const _Radar({required this.progress});
+  final double progress;
+
+  @override
+  State<_Radar> createState() => _RadarState();
+}
+
+class _RadarState extends State<_Radar> with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 160,
+      height: 160,
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (_, __) => Stack(alignment: Alignment.center, children: [
+          for (var i = 0; i < 3; i++)
+            Builder(builder: (_) {
+              final t = (_c.value + i / 3) % 1;
+              return Container(
+                width: 50 + 110 * t,
+                height: 50 + 110 * t,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Lux.gold.withValues(alpha: (1 - t) * 0.6), width: 1.2),
+                ),
+              );
+            }),
+          const IconBadge(Icons.wifi_rounded, size: 56),
+        ]),
       ),
     );
   }
@@ -203,51 +243,68 @@ class _TvRemoteScreenState extends State<TvRemoteScreen> {
 
   String _statusText(BuildContext c) => switch (_state) {
         TvLinkState.idle || TvLinkState.connecting => tr(c, 'Connecting…', 'Đang kết nối…'),
-        TvLinkState.waitingApproval =>
-          tr(c, 'Accept the request on your TV', 'Chọn "Cho phép" trên TV'),
+        TvLinkState.waitingApproval => tr(c, 'Accept the request on your TV', 'Chọn "Cho phép" trên TV'),
         TvLinkState.connected => tr(c, 'Connected', 'Đã kết nối'),
         TvLinkState.denied => tr(c, 'The TV refused the connection', 'TV đã từ chối kết nối'),
         TvLinkState.closed => tr(c, 'Disconnected', 'Đã ngắt kết nối'),
-        TvLinkState.error => tr(c, 'Can’t reach the TV (is it on?)', 'Không kết nối được TV (TV đang bật?)'),
+        TvLinkState.error => tr(c, 'Can’t reach the TV — is it on?', 'Không kết nối được TV — TV đang bật?'),
       };
 
   @override
   Widget build(BuildContext context) {
     final ok = _state == TvLinkState.connected;
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.device.name)),
+    final busy = _state == TvLinkState.connecting || _state == TvLinkState.idle;
+    return LuxScaffold(
+      title: widget.device.name,
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        padding: const EdgeInsets.fromLTRB(24, 4, 24, 32),
         children: [
-          Card(
-            color: ok ? Colors.teal.shade900 : Colors.blueGrey.shade900,
-            child: ListTile(
-              leading: Icon(ok ? Icons.wifi : Icons.wifi_off),
-              title: Text(_statusText(context)),
-              subtitle: Text(
-                '${kindLabel(widget.device.kind)} • ${widget.device.ip}'
-                '${_detail.isNotEmpty && !ok ? '\n$_detail' : ''}',
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: ok || _state == TvLinkState.connecting
-                  ? null
-                  : TextButton(
-                      onPressed: () async {
-                        await _link.close();
-                        _link.connect();
-                      },
-                      child: Text(tr(context, 'Retry', 'Thử lại')),
-                    ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              color: const Color(0x0DFFFFFF),
+              border: Border.all(color: ok ? const Color(0x554CC38A) : Lux.line),
             ),
+            child: Row(children: [
+              Container(
+                width: 9,
+                height: 9,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: ok ? Lux.jade : (busy ? Lux.gold : Lux.ruby),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(_statusText(context), style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(
+                    '${kindLabel(widget.device.kind)} • ${widget.device.ip}'
+                    '${_detail.isNotEmpty && !ok ? ' • $_detail' : ''}',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Lux.muted, fontSize: 12),
+                  ),
+                ]),
+              ),
+              if (!ok && !busy)
+                TextButton(
+                  onPressed: () async {
+                    await _link.close();
+                    _link.connect();
+                  },
+                  child: Text(tr(context, 'Retry', 'Thử lại')),
+                ),
+            ]),
           ),
-          const SizedBox(height: 20),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            RemoteKey(icon: Icons.power_settings_new, color: Colors.red.shade800, onPressed: _k(TvKey.power)),
-            RemoteKey(icon: Icons.input, onPressed: _k(TvKey.source)),
-            RemoteKey(icon: Icons.volume_off, onPressed: _k(TvKey.mute)),
-          ]),
           const SizedBox(height: 24),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            RemoteKey(icon: Icons.power_settings_new_rounded, style: KeyStyle.power, onPressed: _k(TvKey.power)),
+            RemoteKey(icon: Icons.input_rounded, onPressed: _k(TvKey.source)),
+            RemoteKey(icon: Icons.volume_off_rounded, onPressed: _k(TvKey.mute)),
+          ]),
+          const SizedBox(height: 28),
           Center(
             child: DPad(
               onUp: _k(TvKey.up),
@@ -257,35 +314,35 @@ class _TvRemoteScreenState extends State<TvRemoteScreen> {
               onOk: _k(TvKey.ok),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            RemoteKey(icon: Icons.arrow_back, onPressed: _k(TvKey.back)),
-            RemoteKey(icon: Icons.home_outlined, onPressed: _k(TvKey.home)),
-            RemoteKey(icon: Icons.menu, onPressed: _k(TvKey.menu)),
+            RemoteKey(icon: Icons.arrow_back_rounded, onPressed: _k(TvKey.back)),
+            RemoteKey(icon: Icons.home_rounded, onPressed: _k(TvKey.home)),
+            RemoteKey(icon: Icons.menu_rounded, onPressed: _k(TvKey.menu)),
           ]),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             RockerKey(label: 'VOL', onUp: _k(TvKey.volUp), onDown: _k(TvKey.volDown)),
             Column(children: [
-              RemoteKey(icon: Icons.play_arrow, onPressed: _k(TvKey.play)),
+              RemoteKey(icon: Icons.play_arrow_rounded, onPressed: _k(TvKey.play)),
               const SizedBox(height: 18),
-              RemoteKey(icon: Icons.pause, onPressed: _k(TvKey.pause)),
+              RemoteKey(icon: Icons.pause_rounded, onPressed: _k(TvKey.pause)),
             ]),
             RockerKey(
               label: 'CH',
               onUp: _k(TvKey.chUp),
               onDown: _k(TvKey.chDown),
-              upIcon: Icons.keyboard_arrow_up,
-              downIcon: Icons.keyboard_arrow_down,
+              upIcon: Icons.keyboard_arrow_up_rounded,
+              downIcon: Icons.keyboard_arrow_down_rounded,
             ),
           ]),
           if (!ok) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               tr(context,
-                  'Tip: when the TV is fully off, Wi-Fi control can’t wake it — add the same TV over IR to turn it on.',
+                  'Tip: when the TV is fully off, Wi-Fi can’t wake it — add the same TV over infrared to turn it on.',
                   'Mẹo: khi TV tắt hẳn, Wi-Fi không bật được TV — hãy thêm TV này qua hồng ngoại để bật nguồn.'),
-              style: const TextStyle(color: Colors.white38, fontSize: 13),
+              style: const TextStyle(color: Lux.faint, fontSize: 13, height: 1.5),
             ),
           ],
         ],

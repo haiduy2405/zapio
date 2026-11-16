@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: build
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,39 +22,57 @@ jobs:
         with:
           distribution: zulu
           java-version: '17'
+          cache: gradle
 
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
-      # Generates the Android scaffold (gradle files, icons, styles).
-      # Existing files (lib/, MainActivity.kt, AndroidManifest.xml) are kept.
+      # Generates the Android scaffold (gradle files, styles). Existing files
+      # (lib/, MainActivity.kt, AndroidManifest.xml) are kept.
       - name: Create platform scaffold
         run: flutter create --project-name zapio --org com.duyluma --platforms android .
 
       - run: flutter pub get
-      - name: Launcher icons
-        run: dart run flutter_launcher_icons
+      - name: Launcher icons & splash
+        run: |
+          dart run flutter_launcher_icons
+          dart run flutter_native_splash:create
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
-      - run: flutter build apk --release
+
+      # Fixed signing key so each new build installs over the previous one.
+      # Template release builds sign with ~/.android/debug.keystore.
+      - name: Test signing key
+        env:
+          KS: ${{ secrets.TEST_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS" ]; then
+            mkdir -p ~/.android && echo "$KS" | base64 -d > ~/.android/debug.keystore
+            echo "Using fixed test key"
+          else
+            echo "::warning::TEST_KEYSTORE_B64 secret missing - throwaway key, in-app updates will fail"
+          fi
+
+      # Build number = workflow run number; the in-app updater compares it
+      # with the latest GitHub release tag (build-N).
+      - name: Build APK (arm64, GitHub channel)
+        run: >
+          flutter build apk --release
+          --split-per-abi --target-platform android-arm64
+          --build-number=${{ github.run_number }}
+          --build-name=0.2.${{ github.run_number }}
+          --dart-define=CHANNEL=github
 
       - name: Rename APK
-        run: cp build/app/outputs/flutter-apk/app-release.apk zapio-build-${{ github.run_number }}.apk
+        run: cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk zapio-build-${{ github.run_number }}.apk
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: zapio-apk
-          path: zapio-build-${{ github.run_number }}.apk
-
-      - name: Publish test release
+      - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: Zapio test build ${{ github.run_number }}
-          prerelease: true
-          body: |
-            Test APK built from ${{ github.sha }}.
-            Install on Android: download the .apk below, allow "install unknown apps" for your browser.
+          name: Zapio build ${{ github.run_number }}
+          make_latest: true
+          body: ${{ github.event.head_commit.message }}
           files: zapio-build-${{ github.run_number }}.apk
