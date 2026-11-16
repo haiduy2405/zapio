@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum DeviceKind { ir, samsung, lg, roku }
+enum DeviceKind { ir, samsung, lg, roku, androidTv }
 
 /// A device the user added to "My devices".
 class SavedDevice {

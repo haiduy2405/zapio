@@ -254,13 +254,12 @@ class AcBrandPickerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brands = {...AcBrands.map.keys, ...AcBrands.comingSoon}.toList()
+    final brands = AcBrands.map.keys.toList()
       ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     return _BrandList(
       title: Cat.label(context, Cat.ac),
       brands: brands,
       popular: _popular,
-      trailing: (b) => AcBrands.comingSoon.contains(b) ? tr(context, 'Soon', 'Sắp có') : null,
       footer: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
         child: OutlinedButton.icon(
@@ -269,31 +268,7 @@ class AcBrandPickerScreen extends StatelessWidget {
           onPressed: () => _open(context, tr(context, 'Air conditioner', 'Điều hòa')),
         ),
       ),
-      onPick: (b) {
-        if (AcBrands.comingSoon.contains(b)) {
-          showDialog<void>(
-            context: context,
-            builder: (c) => AlertDialog(
-              title: Text(tr(c, '$b support is coming', 'Sắp hỗ trợ $b')),
-              content: Text(tr(c,
-                  'Zapio does not speak the $b protocol yet. You can still try the common protocols — some units use them.',
-                  'Zapio chưa hỗ trợ giao thức riêng của $b. Bạn vẫn có thể thử các giao thức phổ biến — một số máy dùng chung.')),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(c), child: Text(tr(c, 'Close', 'Đóng'))),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(c);
-                    _open(context, b);
-                  },
-                  child: Text(tr(c, 'Try anyway', 'Vẫn thử')),
-                ),
-              ],
-            ),
-          );
-        } else {
-          _open(context, b);
-        }
-      },
+      onPick: (brand) => _open(context, brand),
     );
   }
 

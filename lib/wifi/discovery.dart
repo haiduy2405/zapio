@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import '../devices/device_store.dart';
+import 'android_tv.dart';
 import 'roku.dart';
 import 'samsung_tizen.dart';
 
@@ -15,9 +16,9 @@ class FoundTv {
   String get key => '${kind.name}@$ip';
 }
 
-/// Finds Samsung, LG and Roku TVs on the LAN:
+/// Finds Samsung, LG, Roku and Android/Google TVs on the LAN:
 /// 1. SSDP M-SEARCH (fast, finds all three when multicast works);
-/// 2. a /24 sweep of Samsung's :8001 and Roku's :8060 as a fallback.
+/// 2. a /24 sweep of the Samsung, Roku and Android TV remote ports.
 class TvDiscovery {
   static const _searchTargets = [
     'ssdp:all',
@@ -144,6 +145,9 @@ class TvDiscovery {
         if (s != null) add(FoundTv(DeviceKind.samsung, ip, s));
         final r = await RokuLink.probe(ip, timeout: const Duration(milliseconds: 600));
         if (r != null) add(FoundTv(DeviceKind.roku, ip, r));
+        if (s == null && r == null && await _androidTvOpen(ip)) {
+          add(FoundTv(DeviceKind.androidTv, ip, 'Android / Google TV'));
+        }
       }));
       onProgress?.call(math.min(1, (i + batch) / ips.length));
     }
@@ -156,15 +160,25 @@ class TvDiscovery {
     if (s != null) return FoundTv(DeviceKind.samsung, ip, s);
     final r = await RokuLink.probe(ip, timeout: const Duration(seconds: 3));
     if (r != null) return FoundTv(DeviceKind.roku, ip, r);
+    if (await _androidTvOpen(ip, timeout: const Duration(seconds: 2))) {
+      return FoundTv(DeviceKind.androidTv, ip, 'Android / Google TV');
+    }
     if (await _portOpen(ip, 3000) || await _portOpen(ip, 3001)) {
       return FoundTv(DeviceKind.lg, ip, 'LG TV');
     }
     return null;
   }
 
-  static Future<bool> _portOpen(String ip, int port) async {
+  static Future<bool> _androidTvOpen(String ip, {
+    Duration timeout = const Duration(milliseconds: 500),
+  }) async => await _portOpen(ip, AndroidTvLink.port, timeout: timeout) &&
+      await _portOpen(ip, AndroidTvLink.port + 1, timeout: timeout);
+
+  static Future<bool> _portOpen(String ip, int port, {
+    Duration timeout = const Duration(seconds: 2),
+  }) async {
     try {
-      final s = await Socket.connect(ip, port, timeout: const Duration(seconds: 2));
+      final s = await Socket.connect(ip, port, timeout: timeout);
       s.destroy();
       return true;
     } catch (_) {

@@ -14,11 +14,14 @@ import 'theme.dart';
 import 'widgets.dart';
 
 /// Sends an AC state over IR. Returns false (and shows why) on failure.
-Future<bool> sendAc(BuildContext context, AcProtocol p, AcState s, {required bool wasOn}) async {
+Future<bool> sendAc(BuildContext context, AcProtocol p, AcState s, {
+  required bool wasOn,
+  bool wasSwing = false,
+}) async {
   final messenger = ScaffoldMessenger.of(context);
   final noIr = tr(context, 'This phone has no IR blaster', 'Máy này không có cổng hồng ngoại');
   try {
-    await IrService.instance.transmitFrame(p.encode(s, wasOn: wasOn));
+    await IrService.instance.transmitFrame(p.encodeChange(s, wasOn: wasOn, wasSwing: wasSwing));
     return true;
   } on PlatformException catch (e) {
     messenger.showSnackBar(SnackBar(content: Text(e.code == 'NO_IR' ? noIr : 'IR: ${e.message}')));
@@ -63,6 +66,9 @@ class _AcRemoteScreenState extends State<AcRemoteScreen> {
   AcProtocol? _proto;
   AcState _s = AcState(power: false);
   bool _lastSentOn = false;
+  bool _lastSentSwing = false;
+  bool _sending = false;
+  bool _sendAgain = false;
   Timer? _debounce;
 
   String get _prefKey => 'ac_state_${widget.device.id}';
@@ -78,6 +84,7 @@ class _AcRemoteScreenState extends State<AcRemoteScreen> {
         setState(() {
           _s = AcState.fromJson(jsonDecode(raw) as Map<String, dynamic>);
           _lastSentOn = _s.power;
+          _lastSentSwing = _s.swing;
         });
       }
     });
@@ -100,13 +107,27 @@ class _AcRemoteScreenState extends State<AcRemoteScreen> {
   }
 
   Future<void> _send() async {
+    if (_sending) {
+      _sendAgain = true;
+      return;
+    }
     final p = _proto;
-    if (p == null) return;
-    final ok = await sendAc(context, p, _s, wasOn: _lastSentOn);
-    if (ok) {
-      _lastSentOn = _s.power;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefKey, jsonEncode(_s.toJson()));
+    if (p == null || !mounted) return;
+    _sending = true;
+    try {
+      do {
+        _sendAgain = false;
+        final state = _s.copy();
+        final ok = await sendAc(context, p, state, wasOn: _lastSentOn, wasSwing: _lastSentSwing);
+        if (ok) {
+          _lastSentOn = state.power;
+          _lastSentSwing = state.swing;
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(_prefKey, jsonEncode(state.toJson()));
+        }
+      } while (_sendAgain && mounted);
+    } finally {
+      _sending = false;
     }
   }
 

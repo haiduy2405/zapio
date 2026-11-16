@@ -1,5 +1,7 @@
 import '../ir/encoders.dart';
 
+part 'additional_protocols.dart';
+
 /// Air-conditioner state. AC remotes send the whole state on every press,
 /// so the app keeps it and re-encodes it each time.
 enum AcMode { cool, dry, fan, auto, heat }
@@ -46,7 +48,12 @@ abstract class AcProtocol {
   /// Full-state frame. [wasOn] = power state before this command.
   IrFrame encode(AcState s, {required bool wasOn});
 
+  IrFrame encodeChange(AcState s, {required bool wasOn, required bool wasSwing}) =>
+      encode(s, wasOn: wasOn);
+
   static const all = <AcProtocol>[
+    SamsungAc(), MitsubishiElectricAc(), MitsubishiHeavyAc(),
+    SharpAc(), SharpAc(model: SharpModel.a705), SharpAc(model: SharpModel.a903),
     DaikinAc(), PanasonicAc(), PanasonicAc(modelByte: 0x89),
     GreeAc(), CoolixAc(), MideaAc(), LgAc(), LgAc(variant2: true),
   ];
@@ -398,9 +405,18 @@ class PanasonicAc extends AcProtocol {
 /// AC brands shown in the picker, with the protocols to try in order.
 /// Brands we cannot encode yet fall back to trying every family.
 class AcBrands {
-  static const _generic = ['gree', 'coolix', 'midea48', 'daikin', 'panasonic', 'lg', 'lg2'];
+  static const _generic = [
+    'gree', 'coolix', 'midea48', 'daikin', 'panasonic', 'lg', 'lg2',
+    'samsung', 'mitsubishi_electric', 'mitsubishi_heavy', 'sharp',
+    'sharp_a705', 'sharp_a903',
+  ];
 
   static const map = <String, List<String>>{
+    'Samsung': ['samsung'],
+    'Mitsubishi': ['mitsubishi_electric', 'mitsubishi_heavy'],
+    'Mitsubishi Electric': ['mitsubishi_electric'],
+    'Mitsubishi Heavy Industries': ['mitsubishi_heavy'],
+    'Sharp': ['sharp', 'sharp_a705', 'sharp_a903'],
     'Gree': ['gree'],
     'Tosot': ['gree'],
     'Sinclair': ['gree'],
@@ -423,9 +439,6 @@ class AcBrands {
     'Aqua': _generic,
     'Toshiba': ['coolix', 'midea48', 'gree'],
   };
-
-  /// Brands whose own protocol is not implemented yet (shown as "coming soon").
-  static const comingSoon = ['Mitsubishi', 'Samsung', 'Sharp'];
 
   static List<String> protocolsFor(String brand) => map[brand] ?? _generic;
 

@@ -20,10 +20,12 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
 
     private var updateChannel: MethodChannel? = null
+    private var androidTv: AndroidTvChannel? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         setupUpdateChannel(flutterEngine)
+        androidTv = AndroidTvChannel(this, flutterEngine.dartExecutor.binaryMessenger)
         val ir = getSystemService(Context.CONSUMER_IR_SERVICE) as? ConsumerIrManager
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "zapio/ir")
@@ -65,6 +67,12 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+    }
+
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        androidTv?.dispose()
+        androidTv = null
+        super.cleanUpFlutterEngine(flutterEngine)
     }
 
     private fun nearestCarrier(ir: ConsumerIrManager, freq: Int): Int {

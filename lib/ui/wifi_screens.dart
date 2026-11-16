@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../devices/device_store.dart';
 import '../l10n.dart';
+import '../wifi/android_tv.dart';
 import '../wifi/discovery.dart';
 import '../wifi/tv_link.dart';
 import 'theme.dart';
@@ -11,6 +12,7 @@ String kindLabel(DeviceKind k) => switch (k) {
       DeviceKind.samsung => 'Samsung',
       DeviceKind.lg => 'LG webOS',
       DeviceKind.roku => 'Roku',
+      DeviceKind.androidTv => 'Android / Google TV',
       DeviceKind.ir => 'IR',
     };
 
@@ -151,8 +153,8 @@ class _WifiDiscoverScreenState extends State<WifiDiscoverScreen> {
           const SizedBox(height: 22),
           Text(
             tr(context,
-                'Supported: Samsung (2016+), LG webOS, Roku. The first time, accept the request shown on the TV.',
-                'Hỗ trợ: Samsung (2016+), LG webOS, Roku. Lần đầu kết nối, chọn "Cho phép" trên TV.'),
+                'Supported: Android / Google TV, Samsung (2016+), LG webOS and Roku. Follow the pairing instructions on your TV.',
+                'Hỗ trợ Android / Google TV, Samsung (2016+), LG webOS và Roku. Làm theo hướng dẫn ghép nối trên TV.'),
             style: const TextStyle(color: Lux.faint, fontSize: 13, height: 1.5),
           ),
         ],
@@ -216,6 +218,9 @@ class TvRemoteScreen extends StatefulWidget {
 
 class _TvRemoteScreenState extends State<TvRemoteScreen> {
   late final TvLink _link;
+  final _pin = TextEditingController();
+  bool _pairing = false;
+  bool _pinError = false;
   TvLinkState _state = TvLinkState.idle;
   String _detail = '';
 
@@ -235,11 +240,32 @@ class _TvRemoteScreenState extends State<TvRemoteScreen> {
 
   @override
   void dispose() {
+    _pin.dispose();
     _link.close();
     super.dispose();
   }
 
   VoidCallback? _k(TvKey k) => _state == TvLinkState.connected ? () => _link.send(k) : null;
+
+  Future<void> _submitPin(AndroidTvLink link) async {
+    if (_pairing) return;
+    final code = _pin.text.trim();
+    if (!RegExp(r'^[0-9A-Fa-f]{6}$').hasMatch(code)) {
+      setState(() => _pinError = true);
+      return;
+    }
+    setState(() {
+      _pairing = true;
+      _pinError = false;
+    });
+    final ok = await link.pair(code);
+    if (!mounted) return;
+    if (ok) _pin.clear();
+    setState(() {
+      _pairing = false;
+      _pinError = !ok;
+    });
+  }
 
   String _statusText(BuildContext c) => switch (_state) {
         TvLinkState.idle || TvLinkState.connecting => tr(c, 'Connecting…', 'Đang kết nối…'),
@@ -254,6 +280,9 @@ class _TvRemoteScreenState extends State<TvRemoteScreen> {
   Widget build(BuildContext context) {
     final ok = _state == TvLinkState.connected;
     final busy = _state == TvLinkState.connecting || _state == TvLinkState.idle;
+    final link = _link;
+    final androidTv = link is AndroidTvLink && _state == TvLinkState.waitingApproval ? link : null;
+    final needsPin = androidTv != null;
     return LuxScaffold(
       title: widget.device.name,
       body: ListView(
@@ -278,7 +307,12 @@ class _TvRemoteScreenState extends State<TvRemoteScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(_statusText(context), style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(
+                    needsPin
+                        ? tr(context, 'Enter the code shown on your TV', 'Nhập mã hiển thị trên TV')
+                        : _statusText(context),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   Text(
                     '${kindLabel(widget.device.kind)} • ${widget.device.ip}'
                     '${_detail.isNotEmpty && !ok ? ' • $_detail' : ''}',
@@ -288,7 +322,7 @@ class _TvRemoteScreenState extends State<TvRemoteScreen> {
                   ),
                 ]),
               ),
-              if (!ok && !busy)
+              if (!ok && !busy && !needsPin)
                 TextButton(
                   onPressed: () async {
                     await _link.close();
@@ -298,6 +332,33 @@ class _TvRemoteScreenState extends State<TvRemoteScreen> {
                 ),
             ]),
           ),
+          if (androidTv != null) ...[
+            const SizedBox(height: 16),
+            LuxCard(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                TextField(
+                  controller: _pin,
+                  maxLength: 6,
+                  textCapitalization: TextCapitalization.characters,
+                  textInputAction: TextInputAction.done,
+                  autocorrect: false,
+                  enabled: !_pairing,
+                  onSubmitted: (_) => _submitPin(androidTv),
+                  decoration: InputDecoration(
+                    labelText: tr(context, '6-character code', 'Mã 6 ký tự'),
+                    errorText: _pinError
+                        ? tr(context, 'Check the code shown on the TV', 'Kiểm tra lại mã trên TV')
+                        : null,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                FilledButton(
+                  onPressed: _pairing ? null : () => _submitPin(androidTv),
+                  child: Text(tr(context, 'Pair TV', 'Ghép nối TV')),
+                ),
+              ]),
+            ),
+          ],
           const SizedBox(height: 24),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             RemoteKey(icon: Icons.power_settings_new_rounded, style: KeyStyle.power, onPressed: _k(TvKey.power)),

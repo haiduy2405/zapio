@@ -1,4 +1,5 @@
 import '../devices/device_store.dart';
+import 'android_tv.dart';
 import 'lg_webos.dart';
 import 'roku.dart';
 import 'samsung_tizen.dart';
@@ -14,7 +15,7 @@ enum TvLinkState { idle, connecting, waitingApproval, connected, denied, closed,
 
 typedef TvStateCallback = void Function(TvLinkState state, String detail);
 
-/// Common interface for Samsung Tizen, LG webOS and Roku control.
+/// Common interface for Wi-Fi TV control.
 abstract class TvLink {
   TvLink(this.ip, this.onState);
   final String ip;
@@ -29,6 +30,7 @@ abstract class TvLink {
         DeviceKind.samsung => SamsungLink(ip, onState),
         DeviceKind.lg => LgLink(ip, onState),
         DeviceKind.roku => RokuLink(ip, onState),
+        DeviceKind.androidTv => AndroidTvLink(ip, onState),
         DeviceKind.ir => throw ArgumentError('IR devices have no TvLink'),
       };
 }
