@@ -47,6 +47,7 @@ abstract class AcProtocol {
   IrFrame encode(AcState s, {required bool wasOn});
 
   static const all = <AcProtocol>[
+    DaikinAc(), PanasonicAc(), PanasonicAc(modelByte: 0x89),
     GreeAc(), CoolixAc(), MideaAc(), LgAc(), LgAc(variant2: true),
   ];
 
@@ -283,10 +284,121 @@ class LgAc extends AcProtocol {
   }
 }
 
+// ------------------------------------------------------------------ Daikin
+// Daikin ARC4xx remotes (FTKC/FTKB/FTXS/FTXM…): 5-bit preamble, two fixed
+// 8-byte frames and a 19-byte state frame, LSB first. Each frame ends with a
+// byte-sum checksum — verified against 12 captured frames.
+
+class DaikinAc extends AcProtocol {
+  const DaikinAc();
+  @override
+  String get id => 'daikin';
+  @override
+  String get label => 'Daikin';
+  @override
+  int get minTemp => 18;
+
+  static int sum(List<int> b) => b.fold(0, (a, x) => a + x) & 0xFF;
+
+  static const _modeCode = {
+    AcMode.auto: 0, AcMode.dry: 2, AcMode.cool: 3, AcMode.heat: 4, AcMode.fan: 6,
+  };
+  static const _fanCode = {AcFan.auto: 0xA, AcFan.low: 0x3, AcFan.med: 0x5, AcFan.high: 0x7};
+
+  static List<int> frame1() => _withSum([0x11, 0xDA, 0x27, 0x00, 0xC5, 0x00, 0x00]);
+  static List<int> frame2() => _withSum([0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00]);
+
+  static List<int> _withSum(List<int> b) => [...b, sum(b)];
+
+  static List<int> state(AcState s) {
+    final temp = switch (s.mode) {
+      AcMode.dry => 0xC0,
+      AcMode.fan => 0x32,
+      _ => s.temp.clamp(18, 30) * 2,
+    };
+    return _withSum([
+      0x11, 0xDA, 0x27, 0x00, 0x00,
+      (_modeCode[s.mode]! << 4) | 0x08 | (s.power ? 0x01 : 0x00),
+      temp,
+      0x00,
+      (_fanCode[s.fan]! << 4) | (s.swing ? 0x0F : 0x00),
+      0x00,
+      0x00, 0x06, 0x60, // timers off
+      0x00, 0x00,
+      0xC1, 0x80, 0x00,
+    ]);
+  }
+
+  @override
+  IrFrame encode(AcState s, {required bool wasOn}) {
+    const mark = 430, one = 1300, zero = 430;
+    final p = <int>[];
+    for (var i = 0; i < 5; i++) {
+      p..add(mark)..add(zero);
+    }
+    p..add(mark)..add(25000);
+    for (final f in [frame1(), frame2(), state(s)]) {
+      p..add(3500)..add(1720);
+      _pd(p, _bitsLsb(f), mark, one, zero);
+      p.add(mark);
+      p.add(35000);
+    }
+    p.removeLast(); // end on the final mark
+    return IrFrame(38000, p);
+  }
+}
+
+// --------------------------------------------------------------- Panasonic
+// Panasonic 216-bit (CS-/CU- inverter series): fixed 8-byte frame, 10 ms
+// gap, 19-byte state frame, LSB first, byte-sum checksum — verified against
+// 8 captured frames. [modelByte] differs between remote families.
+
+class PanasonicAc extends AcProtocol {
+  const PanasonicAc({this.modelByte = 0x81});
+  final int modelByte;
+
+  @override
+  String get id => modelByte == 0x81 ? 'panasonic' : 'panasonic_${modelByte.toRadixString(16)}';
+  @override
+  String get label => modelByte == 0x81 ? 'Panasonic' : 'Panasonic (B)';
+
+  static const header = [0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06];
+  static const _modeCode = {
+    AcMode.auto: 0, AcMode.dry: 2, AcMode.cool: 3, AcMode.heat: 4, AcMode.fan: 6,
+  };
+  static const _fanCode = {AcFan.auto: 0xA, AcFan.low: 0x3, AcFan.med: 0x5, AcFan.high: 0x7};
+
+  List<int> state(AcState s) {
+    final b = [
+      0x02, 0x20, 0xE0, 0x04, 0x00,
+      (_modeCode[s.mode]! << 4) | 0x08 | (s.power ? 0x01 : 0x00),
+      s.temp.clamp(16, 30) * 2,
+      0x80,
+      (_fanCode[s.fan]! << 4) | (s.swing ? 0x0F : 0x03),
+      0x00, // horizontal vane: unit default
+      0x00, 0x0E, 0xE0, 0x00, 0x00,
+      modelByte,
+      0x00, 0x00,
+    ];
+    return [...b, b.fold<int>(0, (a, x) => a + x) & 0xFF];
+  }
+
+  @override
+  IrFrame encode(AcState s, {required bool wasOn}) {
+    const mark = 435, one = 1300, zero = 435;
+    final p = <int>[3500, 1750];
+    _pd(p, _bitsLsb(header), mark, one, zero);
+    p..add(mark)..add(10000)..add(3500)..add(1750);
+    _pd(p, _bitsLsb(state(s)), mark, one, zero);
+    p.add(mark);
+    return IrFrame(36700, p);
+  }
+}
+
 /// AC brands shown in the picker, with the protocols to try in order.
 /// Brands we cannot encode yet fall back to trying every family.
 class AcBrands {
-  static const _generic = ['gree', 'coolix', 'midea48', 'lg', 'lg2'];
+  static const _generic = ['gree', 'coolix', 'midea48', 'daikin', 'panasonic', 'lg', 'lg2'];
 
   static const map = <String, List<String>>{
     'Gree': ['gree'],
@@ -299,6 +411,9 @@ class AcBrands {
     'Carrier': ['coolix', 'midea48'],
     'Beko': ['coolix'],
     'LG': ['lg', 'lg2'],
+    'Daikin': ['daikin'],
+    'Panasonic': ['panasonic', 'panasonic_89'],
+    'National': ['panasonic', 'panasonic_89'],
     'Casper': _generic,
     'Funiki': _generic,
     'Nagakawa': _generic,
@@ -310,7 +425,7 @@ class AcBrands {
   };
 
   /// Brands whose own protocol is not implemented yet (shown as "coming soon").
-  static const comingSoon = ['Daikin', 'Panasonic', 'Mitsubishi', 'Samsung', 'Sharp'];
+  static const comingSoon = ['Mitsubishi', 'Samsung', 'Sharp'];
 
   static List<String> protocolsFor(String brand) => map[brand] ?? _generic;
 

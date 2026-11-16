@@ -65,6 +65,31 @@ void main() {
     });
   });
 
+  group('Daikin', () {
+    test('fixed frames', () {
+      expect(hex(DaikinAc.frame1()), '11DA2700C50000D7');
+      expect(hex(DaikinAc.frame2()), '11DA270042000054');
+    });
+    test('captured states (FTXS25KVMA)', () {
+      expect(hex(DaikinAc.state(AcState(mode: AcMode.auto, temp: 18, fan: AcFan.auto))),
+          '11DA270000092400A0000006600000C1800086');
+      expect(hex(DaikinAc.state(AcState(mode: AcMode.auto, temp: 18, fan: AcFan.low))),
+          '11DA27000009240030000006600000C1800016');
+    });
+  });
+
+  group('Panasonic', () {
+    test('captured states (CS-E9HKR)', () {
+      const p = PanasonicAc();
+      expect(hex(p.state(AcState(mode: AcMode.cool, temp: 30, fan: AcFan.auto, swing: true))),
+          '0220E00400393C80AF00000EE0000081000019');
+      expect(hex(p.state(AcState(mode: AcMode.heat, temp: 16, fan: AcFan.auto, swing: true))),
+          '0220E00400492080AF00000EE000008100000D');
+      expect(hex(p.state(AcState(power: false, mode: AcMode.heat, temp: 16, fan: AcFan.auto, swing: true))),
+          '0220E00400482080AF00000EE000008100000C');
+    });
+  });
+
   test('every protocol encodes every state', () {
     for (final p in AcProtocol.all) {
       for (final m in AcMode.values) {
