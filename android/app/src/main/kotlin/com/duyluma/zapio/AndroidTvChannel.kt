@@ -84,7 +84,7 @@ internal class AndroidTvChannel(context: Context, messenger: BinaryMessenger) {
                 call.method == "pair" -> run(result) {
                     val pin = call.argument<String>("code") ?: throw InvalidTvPin()
                     val fingerprint = remote.finishPairing(pin)
-                    preferences.edit().put(remote.ip, fingerprint).apply()
+                    preferences.edit().putString(remote.ip, fingerprint).apply()
                     remote.connect(fingerprint)
                     null
                 }
@@ -254,7 +254,7 @@ private class AndroidTvSession(val ip: String, private val disconnected: () -> U
     private fun pairMessage(connection: SSLSocket, field: Int, message: ByteArray) =
         writeFrame(connection, uint(1, 2) + uint(2, 200) + bytes(field, message))
 
-    private fun expectPair(input: InputStream, field: Int) {
+    private fun expectPair(input: DataInputStream, field: Int) {
         val message = fields(readFrame(input))
         if (message[2] != 200 || !message.containsKey(field)) throw IOException("TV rejected pairing")
     }
