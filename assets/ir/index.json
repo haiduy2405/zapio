@@ -1,0 +1,1046 @@
+[
+ {
+  "category": "AC",
+  "brand": "Hisense",
+  "model": "Hisense DG11J1-99 celsius",
+  "asset": "assets/ir/ACs__Hisense__Hisense_DG11J1-99_celsius.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Hisense",
+  "model": "Hisense DG11J1-99 fahrenheit",
+  "asset": "assets/ir/ACs__Hisense__Hisense_DG11J1-99_fahrenheit.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Hisense",
+  "model": "Hisense room AC",
+  "asset": "assets/ir/ACs__Hisense__Hisense_room_AC.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Hisense",
+  "model": "Hisense window AC",
+  "asset": "assets/ir/ACs__Hisense__Hisense_window_AC.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Midea",
+  "model": "Midea AC MAW05R1WBL",
+  "asset": "assets/ir/ACs__Midea__Midea_AC_MAW05R1WBL.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Midea",
+  "model": "Midea MP12SVKBA3RCM",
+  "asset": "assets/ir/ACs__Midea__Midea_MP12SVKBA3RCM.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Midea",
+  "model": "Midea WWK08CR81N",
+  "asset": "assets/ir/ACs__Midea__Midea_WWK08CR81N.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Midea",
+  "model": "Midea silent cool 26 pro",
+  "asset": "assets/ir/ACs__Midea__Midea_silent_cool_26_pro.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Gree",
+  "model": "GREE YAPOF",
+  "asset": "assets/ir/ACs__GREE__GREE_YAPOF.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Gree",
+  "model": "Gree KFR-70G-A1",
+  "asset": "assets/ir/ACs__GREE__Gree_KFR-70G-A1.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Gree",
+  "model": "Gree airco",
+  "asset": "assets/ir/ACs__GREE__Gree_airco.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Gree",
+  "model": "Gree airco lightoff",
+  "asset": "assets/ir/ACs__GREE__Gree_airco_lightoff.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Samsung",
+  "model": "Samsung AC AR12K",
+  "asset": "assets/ir/ACs__Samsung__Samsung_AC_AR12K.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Samsung",
+  "model": "Samsung AR13TYHZCWKN",
+  "asset": "assets/ir/ACs__Samsung__Samsung_AR13TYHZCWKN.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Samsung",
+  "model": "Samsung Wind-Free",
+  "asset": "assets/ir/ACs__Samsung__Samsung_Wind-Free.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Daikin",
+  "model": "Daikin AC",
+  "asset": "assets/ir/ACs__Daikin__Daikin_AC.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Daikin",
+  "model": "Daikin AC industrial TB",
+  "asset": "assets/ir/ACs__Daikin__Daikin_AC_industrial_TB.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Daikin",
+  "model": "Daikin AC unknownModel",
+  "asset": "assets/ir/ACs__Daikin__Daikin_AC_unknownModel.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Daikin",
+  "model": "Daikin ARC480A41",
+  "asset": "assets/ir/ACs__Daikin__Daikin_ARC480A41.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Daikin",
+  "model": "Daikin ARC480A53",
+  "asset": "assets/ir/ACs__Daikin__Daikin_ARC480A53.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Daikin",
+  "model": "Daikin FTE35KV1",
+  "asset": "assets/ir/ACs__Daikin__Daikin_FTE35KV1.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Daikin",
+  "model": "Daikin FTX50GV1B",
+  "asset": "assets/ir/ACs__Daikin__Daikin_FTX50GV1B.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Daikin",
+  "model": "Daikin FTXM95PVMA",
+  "asset": "assets/ir/ACs__Daikin__Daikin_FTXM95PVMA.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Daikin",
+  "model": "Daikin FTXS25KVMA",
+  "asset": "assets/ir/ACs__Daikin__Daikin_FTXS25KVMA.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "LG",
+  "model": "LG AC",
+  "asset": "assets/ir/ACs__LG__LG_AC.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "LG",
+  "model": "LG AC 2",
+  "asset": "assets/ir/ACs__LG__LG_AC_2.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "LG",
+  "model": "LG COV30332906 AC",
+  "asset": "assets/ir/ACs__LG__LG_COV30332906_AC.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "LG",
+  "model": "LG LP0817WSR",
+  "asset": "assets/ir/ACs__LG__LG_LP0817WSR.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "LG",
+  "model": "LG LP1015WNR AC",
+  "asset": "assets/ir/ACs__LG__LG_LP1015WNR_AC.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "LG",
+  "model": "LG LP1417GSR AC",
+  "asset": "assets/ir/ACs__LG__LG_LP1417GSR_AC.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "LG",
+  "model": "LG LP1419IVSM",
+  "asset": "assets/ir/ACs__LG__LG_LP1419IVSM.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "LG",
+  "model": "LG R12AWN-NB11",
+  "asset": "assets/ir/ACs__LG__LG_R12AWN-NB11.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "LG",
+  "model": "LG SX122CL",
+  "asset": "assets/ir/ACs__LG__LG_SX122CL.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Panasonic",
+  "model": "Panasonic A75C4187",
+  "asset": "assets/ir/ACs__Panasonic__Panasonic_A75C4187.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Panasonic",
+  "model": "Panasonic CS-E9HKR",
+  "asset": "assets/ir/ACs__Panasonic__Panasonic_CS-E9HKR.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Panasonic",
+  "model": "Panasonic CS-UE12RKE",
+  "asset": "assets/ir/ACs__Panasonic__Panasonic_CS-UE12RKE.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Panasonic",
+  "model": "Panasonic CWA75C4179",
+  "asset": "assets/ir/ACs__Panasonic__Panasonic_CWA75C4179.ir"
+ },
+ {
+  "category": "AC",
+  "brand": "Panasonic",
+  "model": "Panasonic Climate A75C2600",
+  "asset": "assets/ir/ACs__Panasonic__Panasonic_Climate_A75C2600.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung",
+  "asset": "assets/ir/TVs__Samsung__Samsung.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA-00721A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA-00721A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA59-00443A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA59-00443A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA59-00484A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA59-00484A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA59-00580A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA59-00580A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA59-00602A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA59-00602A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA59-00714A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA59-00714A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA59-00741A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA59-00741A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA59-00786A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA59-00786A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA59",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA59.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung AA81-00243A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_AA81-00243A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-00511A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-00511A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01081A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01081A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01175N",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01175N.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01178W",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01178W.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01179A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01179A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01180A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01180A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01198 R",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01198_R.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01247A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01247A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01301A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01301A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01303A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01303A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01315B",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01315B.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01315J",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01315J.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01330C",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01330C.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01358C",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01358C.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01385C",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01385C.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01388",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01388.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59-01391A",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59-01391A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung BN59",
+  "asset": "assets/ir/TVs__Samsung__Samsung_BN59.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung Broadband Hospitality",
+  "asset": "assets/ir/TVs__Samsung__Samsung_Broadband_Hospitality.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung E6",
+  "asset": "assets/ir/TVs__Samsung__Samsung_E6.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung H6300 TV",
+  "asset": "assets/ir/TVs__Samsung__Samsung_H6300_TV.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung HQ24ED470AK",
+  "asset": "assets/ir/TVs__Samsung__Samsung_HQ24ED470AK.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung LE37S71B",
+  "asset": "assets/ir/TVs__Samsung__Samsung_LE37S71B.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung LE40R87BD",
+  "asset": "assets/ir/TVs__Samsung__Samsung_LE40R87BD.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung LN32D403E2GCTC",
+  "asset": "assets/ir/TVs__Samsung__Samsung_LN32D403E2GCTC.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung LN46C650L1F",
+  "asset": "assets/ir/TVs__Samsung__Samsung_LN46C650L1F.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung LW17E34C",
+  "asset": "assets/ir/TVs__Samsung__Samsung_LW17E34C.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung P2770HD",
+  "asset": "assets/ir/TVs__Samsung__Samsung_P2770HD.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung QM55RA",
+  "asset": "assets/ir/TVs__Samsung__Samsung_QM55RA.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung QN43Q60AAF",
+  "asset": "assets/ir/TVs__Samsung__Samsung_QN43Q60AAF.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung Royal Caribbean",
+  "asset": "assets/ir/TVs__Samsung__Samsung_Royal_Caribbean.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung Service Menu",
+  "asset": "assets/ir/TVs__Samsung__Samsung_Service_Menu.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung Smart Remote",
+  "asset": "assets/ir/TVs__Samsung__Samsung_Smart_Remote.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung TV 1",
+  "asset": "assets/ir/TVs__Samsung__Samsung_TV_1.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung TV 2",
+  "asset": "assets/ir/TVs__Samsung__Samsung_TV_2.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung TV Full",
+  "asset": "assets/ir/TVs__Samsung__Samsung_TV_Full.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung UE26C4000PW",
+  "asset": "assets/ir/TVs__Samsung__Samsung_UE26C4000PW.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung UE32F4000",
+  "asset": "assets/ir/TVs__Samsung__Samsung_UE32F4000.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung UE32F4000AW",
+  "asset": "assets/ir/TVs__Samsung__Samsung_UE32F4000AW.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung UE48JU6490U",
+  "asset": "assets/ir/TVs__Samsung__Samsung_UE48JU6490U.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung UE75TU7125K",
+  "asset": "assets/ir/TVs__Samsung__Samsung_UE75TU7125K.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung UN32EH5000F",
+  "asset": "assets/ir/TVs__Samsung__Samsung_UN32EH5000F.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung UN40C5000QFXZA",
+  "asset": "assets/ir/TVs__Samsung__Samsung_UN40C5000QFXZA.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung UN60JU6500",
+  "asset": "assets/ir/TVs__Samsung__Samsung_UN60JU6500.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung UN60JU6500 Discrete",
+  "asset": "assets/ir/TVs__Samsung__Samsung_UN60JU6500_Discrete.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Samsung",
+  "model": "Samsung Unknown Model",
+  "asset": "assets/ir/TVs__Samsung__Samsung_Unknown_Model.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "SonyTV",
+  "asset": "assets/ir/TVs__Sony__SonyTV.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony Bravia",
+  "asset": "assets/ir/TVs__Sony__Sony_Bravia.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony Bravia KD-55XF80xx-49XF80xx-43XF80xx",
+  "asset": "assets/ir/TVs__Sony__Sony_Bravia_KD-55XF80xx-49XF80xx-43XF80xx.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony Bravia KDL-46W905A",
+  "asset": "assets/ir/TVs__Sony__Sony_Bravia_KDL-46W905A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony FW 75BZ40H",
+  "asset": "assets/ir/TVs__Sony__Sony_FW_75BZ40H.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony KD-55X80CK",
+  "asset": "assets/ir/TVs__Sony__Sony_KD-55X80CK.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony KD",
+  "asset": "assets/ir/TVs__Sony__Sony_KD.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony KDL-55HX850",
+  "asset": "assets/ir/TVs__Sony__Sony_KDL-55HX850.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RM-GD014",
+  "asset": "assets/ir/TVs__Sony__Sony_RM-GD014.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RM-V310",
+  "asset": "assets/ir/TVs__Sony__Sony_RM-V310.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RM-YD017",
+  "asset": "assets/ir/TVs__Sony__Sony_RM-YD017.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RM-YD018",
+  "asset": "assets/ir/TVs__Sony__Sony_RM-YD018.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RM-YD028",
+  "asset": "assets/ir/TVs__Sony__Sony_RM-YD028.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RM-YD092",
+  "asset": "assets/ir/TVs__Sony__Sony_RM-YD092.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RMEA002",
+  "asset": "assets/ir/TVs__Sony__Sony_RMEA002.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RMF-TX500U",
+  "asset": "assets/ir/TVs__Sony__Sony_RMF-TX500U.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RMT TB400U",
+  "asset": "assets/ir/TVs__Sony__Sony_RMT_TB400U.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RMT TX100D",
+  "asset": "assets/ir/TVs__Sony__Sony_RMT_TX100D.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RMT TX200U",
+  "asset": "assets/ir/TVs__Sony__Sony_RMT_TX200U.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RM ED016",
+  "asset": "assets/ir/TVs__Sony__Sony_RM_ED016.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony RM ED045",
+  "asset": "assets/ir/TVs__Sony__Sony_RM_ED045.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony SFRTV5",
+  "asset": "assets/ir/TVs__Sony__Sony_SFRTV5.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony X2182U",
+  "asset": "assets/ir/TVs__Sony__Sony_X2182U.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony XBR",
+  "asset": "assets/ir/TVs__Sony__Sony_XBR.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony XBR RM-TD017",
+  "asset": "assets/ir/TVs__Sony__Sony_XBR_RM-TD017.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Sony",
+  "model": "Sony XBR RMT-TX200U",
+  "asset": "assets/ir/TVs__Sony__Sony_XBR_RMT-TX200U.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense 32A4HAU",
+  "asset": "assets/ir/TVs__Hisense__Hisense_32A4HAU.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense 55E7KQ",
+  "asset": "assets/ir/TVs__Hisense__Hisense_55E7KQ.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense 55K3201GUWUS",
+  "asset": "assets/ir/TVs__Hisense__Hisense_55K3201GUWUS.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense 55U6K",
+  "asset": "assets/ir/TVs__Hisense__Hisense_55U6K.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense 58R5",
+  "asset": "assets/ir/TVs__Hisense__Hisense_58R5.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense 65K3300UW",
+  "asset": "assets/ir/TVs__Hisense__Hisense_65K3300UW.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense EN3AH39H",
+  "asset": "assets/ir/TVs__Hisense__Hisense_EN3AH39H.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense EN3Y39H",
+  "asset": "assets/ir/TVs__Hisense__Hisense_EN3Y39H.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense EN 33926A",
+  "asset": "assets/ir/TVs__Hisense__Hisense_EN_33926A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense ER22601A",
+  "asset": "assets/ir/TVs__Hisense__Hisense_ER22601A.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense K321UW",
+  "asset": "assets/ir/TVs__Hisense__Hisense_K321UW.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense RokuTV",
+  "asset": "assets/ir/TVs__Hisense__Hisense_RokuTV.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense TV ZDB2190126",
+  "asset": "assets/ir/TVs__Hisense__Hisense_TV_ZDB2190126.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "Hisense",
+  "model": "Hisense U7G",
+  "asset": "assets/ir/TVs__Hisense__Hisense_U7G.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG",
+  "asset": "assets/ir/TVs__LG__LG.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 24LJ4840",
+  "asset": "assets/ir/TVs__LG__LG_24LJ4840.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 27GR95QE TV",
+  "asset": "assets/ir/TVs__LG__LG_27GR95QE_TV.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 32LF650V",
+  "asset": "assets/ir/TVs__LG__LG_32LF650V.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 32LN5406",
+  "asset": "assets/ir/TVs__LG__LG_32LN5406.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 32LW4500",
+  "asset": "assets/ir/TVs__LG__LG_32LW4500.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 37LN5403",
+  "asset": "assets/ir/TVs__LG__LG_37LN5403.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 43NANO779PA",
+  "asset": "assets/ir/TVs__LG__LG_43NANO779PA.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 48LV340H",
+  "asset": "assets/ir/TVs__LG__LG_48LV340H.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 4K TV",
+  "asset": "assets/ir/TVs__LG__LG_4K_TV.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 55LB870V ZA",
+  "asset": "assets/ir/TVs__LG__LG_55LB870V_ZA.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 55UN7300AUD",
+  "asset": "assets/ir/TVs__LG__LG_55UN7300AUD.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG 75UJ6470",
+  "asset": "assets/ir/TVs__LG__LG_75UJ6470.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB33871403",
+  "asset": "assets/ir/TVs__LG__LG_AKB33871403.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB69680401",
+  "asset": "assets/ir/TVs__LG__LG_AKB69680401.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB72913118",
+  "asset": "assets/ir/TVs__LG__LG_AKB72913118.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB72914048",
+  "asset": "assets/ir/TVs__LG__LG_AKB72914048.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB72915206",
+  "asset": "assets/ir/TVs__LG__LG_AKB72915206.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB73275675",
+  "asset": "assets/ir/TVs__LG__LG_AKB73275675.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB74915305",
+  "asset": "assets/ir/TVs__LG__LG_AKB74915305.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB75095307",
+  "asset": "assets/ir/TVs__LG__LG_AKB75095307.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB75375608",
+  "asset": "assets/ir/TVs__LG__LG_AKB75375608.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB75675311",
+  "asset": "assets/ir/TVs__LG__LG_AKB75675311.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB75855501",
+  "asset": "assets/ir/TVs__LG__LG_AKB75855501.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG AKB76043102",
+  "asset": "assets/ir/TVs__LG__LG_AKB76043102.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG C1",
+  "asset": "assets/ir/TVs__LG__LG_C1.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG C9 magic remote",
+  "asset": "assets/ir/TVs__LG__LG_C9_magic_remote.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG Factory Service",
+  "asset": "assets/ir/TVs__LG__LG_Factory_Service.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG Hotel TV Home2",
+  "asset": "assets/ir/TVs__LG__LG_Hotel_TV_Home2.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG Hotel tv",
+  "asset": "assets/ir/TVs__LG__LG_Hotel_tv.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG MKJ33981404",
+  "asset": "assets/ir/TVs__LG__LG_MKJ33981404.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG MKJ39170828 Service",
+  "asset": "assets/ir/TVs__LG__LG_MKJ39170828_Service.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG MR21GC Magic Remote",
+  "asset": "assets/ir/TVs__LG__LG_MR21GC_Magic_Remote.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG OLED48C37LA (LG OLED C3 models)",
+  "asset": "assets/ir/TVs__LG__LG_OLED48C37LA_LG_OLED_C3_models_.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG OLED65C8PUA",
+  "asset": "assets/ir/TVs__LG__LG_OLED65C8PUA.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG TV 42LF5800",
+  "asset": "assets/ir/TVs__LG__LG_TV_42LF5800.ir"
+ },
+ {
+  "category": "TV",
+  "brand": "LG",
+  "model": "LG TV AKB75375604",
+  "asset": "assets/ir/TVs__LG__LG_TV_AKB75375604.ir"
+ },
+ {
+  "category": "Fan",
+  "brand": "Senko",
+  "model": "Senko TR828",
+  "asset": "assets/ir/Fans__Senko__Senko_TR828.ir"
+ },
+ {
+  "category": "Fan",
+  "brand": "Panasonic",
+  "model": "Panasonic FV-30BG1x",
+  "asset": "assets/ir/Fans__Panasonic__Panasonic_FV-30BG1x.ir"
+ }
+]
