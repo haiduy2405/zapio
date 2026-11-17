@@ -78,7 +78,9 @@ class DeviceStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  String newId() => DateTime.now().microsecondsSinceEpoch.toRadixString(36);
+  int _seq = 0;
+  String newId() =>
+      '${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}${(_seq++).toRadixString(36)}';
 
   Future<void> add(SavedDevice d) async {
     devices.add(d);

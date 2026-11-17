@@ -10,6 +10,7 @@ import '../ir/irdb.dart';
 import '../l10n.dart';
 import 'ac_remote_screen.dart';
 import 'home_screen.dart';
+import 'share_screens.dart';
 import 'ir_remote_screen.dart';
 import 'theme.dart';
 import 'widgets.dart';
@@ -64,6 +65,28 @@ class AddDeviceScreen extends StatelessWidget {
                       Text(
                         tr(context, 'Samsung • LG • Roku — no IR blaster needed',
                             'Samsung • LG • Roku — không cần cổng hồng ngoại'),
+                        style: const TextStyle(color: Lux.muted, fontSize: 13),
+                      ),
+                    ]),
+                  ),
+                  const Icon(Icons.chevron_right_rounded, color: Lux.gold),
+                ]),
+              ),
+              const SizedBox(height: 12),
+              LuxCard(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ScanQrScreen()),
+                ),
+                child: Row(children: [
+                  const IconBadge(Icons.qr_code_scanner_rounded, size: 56),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(tr(context, 'Copy from another phone', 'Sao chép từ điện thoại khác'),
+                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 4),
+                      Text(
+                        tr(context, 'Scan the QR code shared by Zapio', 'Quét mã QR được chia sẻ từ Zapio'),
                         style: const TextStyle(color: Lux.muted, fontSize: 13),
                       ),
                     ]),

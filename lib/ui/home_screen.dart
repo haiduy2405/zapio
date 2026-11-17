@@ -6,6 +6,8 @@ import '../update/update_gate.dart';
 import '../update/updater.dart';
 import 'ac_remote_screen.dart';
 import 'add_device.dart';
+import 'share_screens.dart';
+import '../devices/share_codec.dart';
 import 'ir_remote_screen.dart';
 import 'theme.dart';
 import 'widgets.dart';
@@ -41,6 +43,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void _add() => Navigator.of(context)
       .push(MaterialPageRoute(builder: (_) => const AddDeviceScreen()));
 
+  void _shareQr(List<SavedDevice> list) => Navigator.of(context)
+      .push(MaterialPageRoute(builder: (_) => ShareQrScreen(devices: list)));
+
+  void _scanQr() => Navigator.of(context)
+      .push(MaterialPageRoute(builder: (_) => const ScanQrScreen()));
+
   void _open(SavedDevice d) => Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => d.isWifi
             ? TvRemoteScreen(device: d)
@@ -64,6 +72,18 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(d.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             ListTile(
+              leading: const Icon(Icons.qr_code_2_rounded, color: Lux.gold),
+              title: Text(tr(c, 'Share via QR code', 'Chia sẻ qua mã QR')),
+              subtitle: Text(tr(c, 'Copy this remote to another phone', 'Sao chép remote sang điện thoại khác'),
+                  style: const TextStyle(color: Lux.muted, fontSize: 12)),
+              onTap: () => Navigator.pop(c, 'share'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.copy_all_rounded),
+              title: Text(tr(c, 'Duplicate', 'Nhân bản')),
+              onTap: () => Navigator.pop(c, 'duplicate'),
+            ),
+            ListTile(
               leading: const Icon(Icons.edit_outlined),
               title: Text(tr(c, 'Rename', 'Đổi tên')),
               onTap: () => Navigator.pop(c, 'rename'),
@@ -78,7 +98,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     if (!mounted) return;
-    if (action == 'delete') {
+    if (action == 'share') {
+      _shareQr([d]);
+    } else if (action == 'duplicate') {
+      final name = await askName(context, '${d.name} (2)');
+      if (name != null) await ShareCodec.duplicate(d, name);
+    } else if (action == 'delete') {
       await store.remove(d);
     } else if (action == 'rename') {
       final name = await askName(context, d.name);
@@ -98,8 +123,23 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 28, 20, 8),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const GoldText('Zapio',
-                  style: TextStyle(fontSize: 38, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
+              Row(children: [
+                const Expanded(
+                  child: GoldText('Zapio',
+                      style: TextStyle(fontSize: 38, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
+                ),
+                IconButton(
+                  tooltip: tr(context, 'Scan QR code', 'Quét mã QR'),
+                  icon: const Icon(Icons.qr_code_scanner_rounded, color: Lux.gold),
+                  onPressed: _scanQr,
+                ),
+                if (devices.isNotEmpty)
+                  IconButton(
+                    tooltip: tr(context, 'Share all devices', 'Chia sẻ tất cả thiết bị'),
+                    icon: const Icon(Icons.ios_share_rounded, color: Lux.gold),
+                    onPressed: () => _shareQr(List.of(devices)),
+                  ),
+              ]),
               const SizedBox(height: 2),
               Text(
                 devices.isEmpty
